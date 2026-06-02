@@ -776,4 +776,34 @@ loadMovies();
   document.addEventListener("visibilitychange",()=>{running=!document.hidden;if(running)requestAnimationFrame(tick);});
   requestAnimationFrame(tick);
 })();
+
+/* ── Basic client-side protection (deterrent only) ── */
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+document.addEventListener("keydown", e => {
+  const k = e.key.toUpperCase();
+
+  if (
+    k === "F12" ||
+    (e.ctrlKey && e.shiftKey && ["I","J","C","K"].includes(k)) ||
+    (e.ctrlKey && ["U","S"].includes(k))
+  ) {
+    e.preventDefault();
+    showToast("🔒", "Action disabled");
+    return false;
+  }
+});
+
+setInterval(() => {
+  const threshold = 160;
+  const devtoolsOpen =
+    window.outerWidth - window.innerWidth > threshold ||
+    window.outerHeight - window.innerHeight > threshold;
+
+  if (devtoolsOpen) {
+    document.body.innerHTML =
+      '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#050816;color:white;">Developer tools detected</div>';
+  }
+}, 1000);
+
 </script>
