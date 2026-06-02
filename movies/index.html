@@ -307,6 +307,116 @@ body.admin-mode #admin-bar { display:flex; }
 footer { position:relative; z-index:1; text-align:center; padding:2rem 1.5rem 6rem; font-size:.7rem; color:oklch(0.68 0.04 270/.45); letter-spacing:.05em; }
 footer a { color:var(--accent); }
 footer a:hover { text-decoration:underline; }
+
+/* ── Filter / search bar ── */
+.filter-bar {
+  display:flex; align-items:center; gap:.65rem;
+  margin-bottom:2rem; flex-wrap:wrap;
+}
+.filter-search-wrap {
+  position:relative; flex:1; min-width:200px;
+}
+.filter-search-wrap svg { position:absolute; left:.75rem; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; }
+#filter-input {
+  width:100%; background:oklch(0.11 0.025 260); border:1px solid var(--border);
+  border-radius:.75rem; padding:.58rem .9rem .58rem 2.4rem;
+  font-size:.83rem; color:var(--fg); outline:none; transition:border-color .2s;
+}
+#filter-input:focus { border-color:oklch(0.78 0.18 200/.5); }
+#filter-input::placeholder { color:oklch(0.68 0.04 270/.4); }
+.filter-select {
+  background:oklch(0.11 0.025 260); border:1px solid var(--border);
+  border-radius:.75rem; padding:.56rem .85rem; font-size:.8rem;
+  color:var(--muted); outline:none; cursor:pointer; transition:border-color .2s;
+  appearance:none; -webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right .65rem center; padding-right:2rem;
+}
+.filter-select:focus { border-color:oklch(0.78 0.18 200/.5); }
+.filter-fav-pill {
+  display:inline-flex; align-items:center; gap:.4rem;
+  padding:.5rem .85rem; border-radius:9999px; font-size:.78rem; font-weight:700;
+  border:1px solid var(--border); color:var(--muted); background:oklch(0.11 0.025 260);
+  cursor:pointer; transition:all .2s; white-space:nowrap;
+}
+.filter-fav-pill.active { border-color:oklch(0.85 0.18 85/.5); color:#fbbf24; background:oklch(0.14 0.05 85/.12); }
+.filter-count { font-size:.75rem; color:var(--muted); white-space:nowrap; padding:.4rem .4rem; }
+
+/* ── Stats strip (admin only) ── */
+.admin-stats {
+  display:none; align-items:center; gap:1.5rem;
+  background:oklch(0.14 0.03 270); border:1px solid var(--border);
+  border-radius:1rem; padding:.9rem 1.2rem; margin-bottom:1.5rem;
+  flex-wrap:wrap;
+}
+body.admin-mode .admin-stats { display:flex; }
+.stat-item { display:flex; flex-direction:column; gap:.1rem; }
+.stat-val { font-family:var(--display); font-size:1.4rem; font-weight:700; line-height:1; background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.stat-lbl { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.14em; color:var(--muted); }
+.stat-div { width:1px; height:2rem; background:var(--border); flex-shrink:0; }
+
+/* ── Bulk import modal ── */
+#bulk-modal {
+  position:fixed; inset:0; z-index:300; display:none;
+  align-items:center; justify-content:center; padding:1.5rem;
+  background:oklch(0.09 0.025 260/.88); backdrop-filter:blur(16px);
+}
+#bulk-modal.open { display:flex; animation:fade-in .2s ease both; }
+.bulk-card {
+  background:oklch(0.14 0.03 270); border:1px solid oklch(1 0 0/.12);
+  border-radius:1.5rem; padding:2rem; width:100%; max-width:560px;
+  max-height:90vh; overflow-y:auto;
+  box-shadow:0 32px 80px rgba(0,0,0,.6);
+  animation:modal-in .3s cubic-bezier(.34,1.56,.64,1) both;
+}
+#bulk-textarea {
+  width:100%; background:oklch(0.11 0.025 260); border:1px solid var(--border);
+  border-radius:.75rem; padding:.75rem .9rem; font-size:.83rem; color:var(--fg);
+  outline:none; resize:vertical; min-height:120px; line-height:1.7;
+  transition:border-color .2s; font-family:var(--mono);
+}
+#bulk-textarea:focus { border-color:oklch(0.78 0.18 200/.5); }
+#bulk-textarea::placeholder { color:oklch(0.68 0.04 270/.4); font-family:var(--body); }
+
+/* Bulk results list */
+#bulk-results { display:flex; flex-direction:column; gap:.5rem; margin-top:1rem; }
+.bulk-row {
+  display:grid; grid-template-columns:42px 1fr auto;
+  align-items:center; gap:.65rem;
+  background:oklch(0.11 0.025 260); border:1px solid var(--border);
+  border-radius:.75rem; padding:.55rem .75rem;
+  transition:border-color .2s;
+}
+.bulk-row.found { border-color:oklch(0.78 0.18 200/.25); }
+.bulk-row.not-found { border-color:oklch(0.65 0.22 25/.25); opacity:.7; }
+.bulk-thumb { width:42px; height:63px; border-radius:.4rem; object-fit:cover; background:var(--card); flex-shrink:0; }
+.bulk-thumb-ph { width:42px; height:63px; border-radius:.4rem; background:var(--card); display:flex; align-items:center; justify-content:center; font-size:.6rem; color:var(--muted); flex-shrink:0; }
+.bulk-info { min-width:0; }
+.bulk-title { font-size:.82rem; font-weight:600; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.bulk-meta  { font-size:.7rem; color:var(--muted); margin-top:.1rem; }
+.bulk-status { font-size:.72rem; font-weight:700; padding:.25rem .6rem; border-radius:9999px; flex-shrink:0; }
+.bulk-status.ok  { background:oklch(0.78 0.18 200/.15); color:var(--accent); }
+.bulk-status.err { background:oklch(0.65 0.22 25/.15); color:oklch(0.75 0.22 25); }
+.bulk-status.dup { background:oklch(0.68 0.04 270/.2); color:var(--muted); }
+.bulk-status.loading { color:var(--muted); }
+
+.bulk-lookup-btn {
+  width:100%; background:oklch(0.17 0.04 270); border:1px solid var(--border);
+  border-radius:.75rem; padding:.72rem; font-size:.85rem; font-weight:700;
+  color:var(--accent); transition:all .2s; cursor:pointer; margin-top:.75rem;
+}
+.bulk-lookup-btn:hover { background:oklch(0.2 0.04 270); border-color:oklch(0.78 0.18 200/.35); }
+.bulk-lookup-btn:disabled { opacity:.4; cursor:not-allowed; }
+
+.bulk-import-btn {
+  flex:1; background:var(--grad); color:oklch(0.1 0.02 270);
+  padding:.72rem; border-radius:9999px; font-size:.85rem; font-weight:700;
+  box-shadow:0 0 20px oklch(0.7 0.22 295/.3);
+  transition:transform .2s, box-shadow .2s; cursor:pointer; border:none;
+}
+.bulk-import-btn:hover { transform:scale(1.02); }
+.bulk-import-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+.bulk-summary { font-size:.78rem; color:var(--muted); text-align:center; margin-top:.6rem; }
 </style>
 
 <!-- Layers -->
@@ -340,6 +450,47 @@ footer a:hover { text-decoration:underline; }
       A <span style="color:#fbbf24">★</span> means it stuck with me.
     </p>
   </div>
+  <!-- Admin stats strip -->
+  <div class="admin-stats" id="admin-stats">
+    <div class="stat-item">
+      <div class="stat-val" id="stat-total">0</div>
+      <div class="stat-lbl">Total films</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <div class="stat-val" id="stat-favs">0</div>
+      <div class="stat-lbl">Favourites</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <div class="stat-val" id="stat-years">—</div>
+      <div class="stat-lbl">Year range</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat-item">
+      <div class="stat-val" id="stat-posters">0%</div>
+      <div class="stat-lbl">With poster</div>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="filter-search-wrap">
+      <svg fill="none" height="14" viewBox="0 0 24 24" width="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="filter-input" placeholder="Filter movies…" autocomplete="off">
+    </div>
+    <select id="sort-select" class="filter-select">
+      <option value="date-desc">Recently added</option>
+      <option value="date-asc">Oldest first</option>
+      <option value="title-asc">A → Z</option>
+      <option value="title-desc">Z → A</option>
+      <option value="year-desc">Newest year</option>
+      <option value="year-asc">Oldest year</option>
+    </select>
+    <button class="filter-fav-pill" id="filter-fav-pill">★ Faves only</button>
+    <span class="filter-count" id="filter-count"></span>
+  </div>
+
   <div class="movie-grid" id="movie-grid"></div>
 </div>
 
@@ -352,6 +503,10 @@ footer a:hover { text-decoration:underline; }
   <button class="admin-btn admin-btn-add" id="btn-add-movie">
     <svg fill="none" height="13" viewBox="0 0 24 24" width="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     Add Movie
+  </button>
+  <button class="admin-btn" id="btn-bulk-import" style="border-color:oklch(0.78 0.18 200/.35);color:var(--accent);">
+    <svg fill="none" height="13" viewBox="0 0 24 24" width="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    Bulk Import
   </button>
   <button class="admin-btn admin-btn-exit" id="btn-exit-admin">Exit</button>
 </div>
@@ -390,6 +545,31 @@ footer a:hover { text-decoration:underline; }
   </div>
 </div>
 
+<!-- Bulk Import modal -->
+<div id="bulk-modal">
+  <div class="bulk-card">
+    <div class="modal-title">Bulk <span>Import</span></div>
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:1.1rem;line-height:1.6;">Paste one movie title per line. We'll look each one up on TMDB automatically.</p>
+
+    <div class="field">
+      <label>Movie titles (one per line)</label>
+      <textarea id="bulk-textarea" placeholder="The Godfather&#10;Inception&#10;Toy Story&#10;Spirited Away"></textarea>
+    </div>
+
+    <button class="bulk-lookup-btn" id="bulk-lookup-btn">
+      🔍 Look up on TMDB
+    </button>
+
+    <div id="bulk-results"></div>
+
+    <div class="modal-actions" style="margin-top:1.25rem;">
+      <button class="modal-btn-cancel" id="bulk-cancel">Cancel</button>
+      <button class="bulk-import-btn" id="bulk-import-btn" disabled>Import all found</button>
+    </div>
+    <p class="bulk-summary" id="bulk-summary"></p>
+  </div>
+</div>
+
 <!-- Login overlay -->
 <div id="login-overlay">
   <div class="login-card">
@@ -406,11 +586,7 @@ footer a:hover { text-decoration:underline; }
 <div id="toast"><span class="t-icon" id="toast-icon"></span><span id="toast-msg"></span></div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════════════
-   ⚙️  CONFIG — edit these three values, nothing else
-   Auth is handled by Supabase — no password stored here.
-   RLS setup: SELECT open to all; INSERT/UPDATE/DELETE require auth.
-═══════════════════════════════════════════════════════════════════ */
+//═══════════════════════════════════════════════════════════════════ */
 
 // 1. Your TMDB API key (free) → https://www.themoviedb.org/settings/api
 const TMDB_KEY = "c61534a363897b5a6a5029a95c8e2233";
@@ -525,14 +701,41 @@ async function deleteMovie(id) {
 function renderGrid() {
   const grid = document.getElementById("movie-grid");
   const countEl = document.getElementById("page-count");
-  countEl.textContent = `${movies.length} film${movies.length !== 1 ? "s" : ""} and counting`;
 
-  if (movies.length === 0) {
-    grid.innerHTML = `<div style="grid-column:1/-1;color:var(--muted);font-size:.88rem;padding:3rem 0;">No movies yet.</div>`;
+  // Apply filter + fav filter
+  let list = movies.filter(m => {
+    if (favOnly && !m.fav) return false;
+    if (filterQuery) {
+      const q = filterQuery;
+      return m.title.toLowerCase().includes(q) || String(m.year).includes(q);
+    }
+    return true;
+  });
+
+  // Sort
+  list = [...list].sort((a, b) => {
+    switch(sortMode) {
+      case "date-asc":   return (a.id||0) - (b.id||0);
+      case "title-asc":  return a.title.localeCompare(b.title);
+      case "title-desc": return b.title.localeCompare(a.title);
+      case "year-desc":  return (b.year||0) - (a.year||0);
+      case "year-asc":   return (a.year||0) - (b.year||0);
+      default:           return (b.id||0) - (a.id||0); // date-desc
+    }
+  });
+
+  countEl.textContent = `${movies.length} film${movies.length !== 1 ? "s" : ""} and counting`;
+  const filterCountEl = document.getElementById("filter-count");
+  filterCountEl.textContent = (filterQuery || favOnly) ? `${list.length} shown` : "";
+
+  updateStats();
+
+  if (list.length === 0) {
+    grid.innerHTML = `<div style="grid-column:1/-1;color:var(--muted);font-size:.88rem;padding:3rem 0;">${movies.length ? "No matches." : "No movies yet."}</div>`;
     return;
   }
 
-  grid.innerHTML = movies.map((m, i) => {
+  grid.innerHTML = list.map((m, i) => {
     const poster = m.poster_path
       ? `<img class="poster-img" src="${TMDB_IMG}${m.poster_path}" alt="${m.title}" loading="lazy">`
       : `<div class="poster-ph">${m.title}</div>`;
@@ -735,6 +938,150 @@ saveBtn.addEventListener("click", async () => {
     saveBtn.disabled = false;
     saveBtn.textContent = "Add to list";
   }
+});
+
+// ── Filter / Sort / Stats ──
+let filterQuery = "";
+let sortMode = "date-desc";
+let favOnly = false;
+
+document.getElementById("filter-input").addEventListener("input", e => {
+  filterQuery = e.target.value.toLowerCase().trim();
+  renderGrid();
+});
+document.getElementById("sort-select").addEventListener("change", e => {
+  sortMode = e.target.value;
+  renderGrid();
+});
+document.getElementById("filter-fav-pill").addEventListener("click", function() {
+  favOnly = !favOnly;
+  this.classList.toggle("active", favOnly);
+  renderGrid();
+});
+
+function updateStats() {
+  const total = movies.length;
+  const favs  = movies.filter(m => m.fav).length;
+  const years = movies.map(m => m.year).filter(Boolean);
+  const minY  = years.length ? Math.min(...years) : null;
+  const maxY  = years.length ? Math.max(...years) : null;
+  const withPoster = movies.filter(m => m.poster_path).length;
+  document.getElementById("stat-total").textContent   = total;
+  document.getElementById("stat-favs").textContent    = favs;
+  document.getElementById("stat-years").textContent   = minY ? (minY === maxY ? minY : `${minY}–${maxY}`) : "—";
+  document.getElementById("stat-posters").textContent = total ? Math.round(withPoster / total * 100) + "%" : "—";
+}
+
+// ── Bulk Import ──
+let bulkResults = []; // { query, movie|null, status: 'found'|'not-found'|'dup' }
+
+const bulkModal      = document.getElementById("bulk-modal");
+const bulkTextarea   = document.getElementById("bulk-textarea");
+const bulkLookupBtn  = document.getElementById("bulk-lookup-btn");
+const bulkImportBtn  = document.getElementById("bulk-import-btn");
+const bulkResultsEl  = document.getElementById("bulk-results");
+const bulkSummaryEl  = document.getElementById("bulk-summary");
+
+document.getElementById("btn-bulk-import").addEventListener("click", () => {
+  bulkTextarea.value = "";
+  bulkResults = [];
+  bulkResultsEl.innerHTML = "";
+  bulkSummaryEl.textContent = "";
+  bulkImportBtn.disabled = true;
+  bulkModal.classList.add("open");
+  setTimeout(() => bulkTextarea.focus(), 100);
+});
+
+document.getElementById("bulk-cancel").addEventListener("click", () => bulkModal.classList.remove("open"));
+bulkModal.addEventListener("click", e => { if (e.target === bulkModal) bulkModal.classList.remove("open"); });
+
+bulkLookupBtn.addEventListener("click", async () => {
+  const lines = bulkTextarea.value.split("\n").map(l => l.trim()).filter(Boolean);
+  if (!lines.length) return;
+
+  bulkLookupBtn.disabled = true;
+  bulkLookupBtn.textContent = "Looking up…";
+  bulkResults = [];
+  bulkResultsEl.innerHTML = lines.map((q, i) =>
+    `<div class="bulk-row" id="brow-${i}">
+      <div class="bulk-thumb-ph">🎬</div>
+      <div class="bulk-info">
+        <div class="bulk-title">${q}</div>
+        <div class="bulk-meta">Searching…</div>
+      </div>
+      <span class="bulk-status loading">…</span>
+    </div>`
+  ).join("");
+
+  const existingTitles = new Set(movies.map(m => m.title.toLowerCase()));
+
+  for (let i = 0; i < lines.length; i++) {
+    const q = lines[i];
+    const rowEl = document.getElementById(`brow-${i}`);
+    try {
+      const url = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${encodeURIComponent(q)}&include_adult=false`;
+      const data = await (await fetch(url)).json();
+      const hit = (data.results || [])[0];
+      if (!hit) throw new Error("not found");
+
+      const year = hit.release_date ? hit.release_date.slice(0, 4) : "—";
+      const isDup = existingTitles.has(hit.title.toLowerCase());
+      const status = isDup ? "dup" : "found";
+      const statusLabel = isDup ? "Already in list" : "Ready";
+
+      bulkResults.push({ query: q, movie: { title: hit.title, year: parseInt(year) || 0, poster_path: hit.poster_path || null }, status });
+
+      const thumb = hit.poster_path
+        ? `<img class="bulk-thumb" src="${TMDB_THUMB}${hit.poster_path}" alt="" loading="lazy">`
+        : `<div class="bulk-thumb-ph">🎬</div>`;
+
+      rowEl.className = `bulk-row ${isDup ? "dup" : "found"}`;
+      rowEl.innerHTML = `
+        ${thumb}
+        <div class="bulk-info">
+          <div class="bulk-title">${hit.title}</div>
+          <div class="bulk-meta">${year}${hit.vote_average ? ` · ★ ${hit.vote_average.toFixed(1)}` : ""}</div>
+        </div>
+        <span class="bulk-status ${isDup ? "dup" : "ok"}">${statusLabel}</span>`;
+    } catch {
+      bulkResults.push({ query: q, movie: null, status: "not-found" });
+      rowEl.className = "bulk-row not-found";
+      rowEl.innerHTML = `
+        <div class="bulk-thumb-ph">✕</div>
+        <div class="bulk-info">
+          <div class="bulk-title">${q}</div>
+          <div class="bulk-meta">Not found on TMDB</div>
+        </div>
+        <span class="bulk-status err">Not found</span>`;
+    }
+    await new Promise(r => setTimeout(r, 120)); // rate-limit TMDB
+  }
+
+  const found = bulkResults.filter(r => r.status === "found").length;
+  const dup   = bulkResults.filter(r => r.status === "dup").length;
+  const miss  = bulkResults.filter(r => r.status === "not-found").length;
+  bulkSummaryEl.textContent = `${found} ready to import · ${dup} already in list · ${miss} not found`;
+  bulkImportBtn.disabled = found === 0;
+  bulkImportBtn.textContent = `Import ${found} movie${found !== 1 ? "s" : ""}`;
+  bulkLookupBtn.disabled = false;
+  bulkLookupBtn.textContent = "🔍 Look up on TMDB";
+});
+
+bulkImportBtn.addEventListener("click", async () => {
+  const toImport = bulkResults.filter(r => r.status === "found");
+  if (!toImport.length) return;
+  bulkImportBtn.disabled = true;
+  bulkImportBtn.textContent = `Importing…`;
+  let done = 0;
+  for (const row of toImport) {
+    try {
+      await addMovie({ ...row.movie, fav: false });
+      done++;
+      bulkImportBtn.textContent = `Imported ${done}/${toImport.length}…`;
+    } catch {}
+  }
+  bulkModal.classList.remove("open");
+  showToast("🎬", `${done} movie${done !== 1 ? "s" : ""} imported`);
 });
 
 // ── Toast ──
