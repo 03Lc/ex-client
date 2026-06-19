@@ -398,3 +398,120 @@ document.addEventListener("DOMContentLoaded", function () {
   // due to browser chrome (address bar, nav bars) affecting outerHeight/innerHeight.
 
 });
+// --------- Cover Flow Carousel ---------
+(function coverFlow(){
+  var cur = 0, dragging = false, dragX = 0, vel = 0, lastX = 0, lastT = 0, hovering = false;
+
+  function init(){
+    var cardsEl = document.getElementById('cfCards');
+    if(!cardsEl) return;
+    var cards = Array.from(cardsEl.querySelectorAll('.cf-card'));
+    var dotsEl = document.getElementById('cfDots');
+    var N = cards.length;
+
+    if(dotsEl){
+      Array.from(dotsEl.querySelectorAll('.cf-dot')).forEach(function(d,i){
+        d.addEventListener('click', function(){ goTo(i); });
+      });
+    }
+
+    cards.forEach(function(c,i){
+      c.addEventListener('click', function(){ if(!dragging) goTo(i); });
+    });
+
+    var prevBtn = document.getElementById('cfPrev');
+    var nextBtn = document.getElementById('cfNext');
+    if(prevBtn) prevBtn.addEventListener('click', function(){ goTo(cur-1); });
+    if(nextBtn) nextBtn.addEventListener('click', function(){ goTo(cur+1); });
+
+    document.addEventListener('keydown', function(e){
+      if(e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      var section = document.getElementById('work');
+      if(!section) return;
+      var r = section.getBoundingClientRect();
+      if(r.top < window.innerHeight * 0.8 && r.bottom > window.innerHeight * 0.2){
+        e.preventDefault();
+        goTo(cur + (e.key === 'ArrowRight' ? 1 : -1));
+      }
+    });
+
+    var sw = document.querySelector('.cf-stage-wrap');
+    if(sw){
+      sw.addEventListener('pointerenter', function(){ hovering=true;  layout(); });
+      sw.addEventListener('pointerleave', function(){ hovering=false; layout(); });
+      sw.addEventListener('pointerdown', function(e){
+        dragging=true; dragX=e.clientX; lastX=e.clientX; lastT=Date.now(); vel=0;
+        sw.setPointerCapture(e.pointerId);
+      });
+      sw.addEventListener('pointermove', function(e){
+        if(!dragging) return;
+        var now=Date.now(), dt=Math.max(1,now-lastT);
+        vel=(e.clientX-lastX)/dt*16; lastX=e.clientX; lastT=now;
+      });
+      sw.addEventListener('pointerup', function(e){
+        if(!dragging) return; dragging=false;
+        var dx=e.clientX-dragX;
+        if(Math.abs(dx)>45||Math.abs(vel)>4) goTo(cur+(dx<0?1:-1));
+        vel=0;
+      });
+    }
+
+    window.addEventListener('resize', layout);
+    layout();
+
+    function layout(){
+      var stageEl = document.querySelector('.cf-stage-wrap');
+      var W = stageEl ? stageEl.offsetWidth : (cardsEl.offsetWidth || 700);
+      var CW = Math.min(520, W * 0.86);
+      var CH = 290;
+
+      cards.forEach(function(c, i){
+        c.style.width  = CW + 'px';
+        c.style.height = CH + 'px';
+
+        var d   = i - cur;
+        var abs = Math.abs(d);
+        c.classList.toggle('cf-active', d === 0);
+
+        if(d === 0){
+          var sc = hovering ? 1.08 : 1.02;
+          var ty = hovering ? -16  : -8;
+          var br = hovering ? 1.15 : 1.06;
+          c.style.transform = 'translateX('+(W/2-CW/2)+'px) translateY(calc(-50% + '+ty+'px)) rotateY(0deg) scale('+sc+')';
+          c.style.opacity   = '1';
+          c.style.filter    = 'brightness('+br+')';
+          c.style.zIndex    = '20';
+        } else {
+          var side = d > 0 ? 1 : -1;
+          var step = Math.min(abs, 4);
+          var dimExtra = hovering ? 0.15 : 0;
+          var gap = CW * 0.38 + step * 14;
+          var tx  = W/2 - CW/2 + side * gap;
+          var ry  = side * Math.min(44 + step * 7, 68);
+          var sc2 = Math.max(0.52, 0.74 - step * 0.07);
+          var op  = Math.max(0,    0.55 - step * 0.13 - dimExtra);
+          var br2 = Math.max(0.20, 0.56 - step * 0.10 - dimExtra);
+          var sideY = step * 8;
+          c.style.transform = 'translateX('+tx+'px) translateY(calc(-50% + '+sideY+'px)) rotateY('+ry+'deg) scale('+sc2+')';
+          c.style.opacity   = op;
+          c.style.filter    = 'brightness('+br2+')';
+          c.style.zIndex    = String(10 - abs);
+        }
+      });
+
+      if(dotsEl){
+        Array.from(dotsEl.querySelectorAll('.cf-dot')).forEach(function(d,i){
+          d.classList.toggle('cf-on', i===cur);
+        });
+      }
+    }
+
+    function goTo(i){ cur=((i%N)+N)%N; layout(); }
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
