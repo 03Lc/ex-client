@@ -463,7 +463,11 @@ document.addEventListener("DOMContentLoaded", function () {
       var stageEl = document.querySelector('.cf-stage-wrap');
       var W = stageEl ? stageEl.offsetWidth : (cardsEl.offsetWidth || 700);
       var CW = Math.min(520, W * 0.86);
-      var CH = 290;
+      // card height now mirrors the .cf-stage-wrap height set in CSS for each breakpoint
+      // (280px <=380px, 300px <=640px, 380px above) instead of a fixed value that
+      // could crop/clip on very small phones.
+      var vw = window.innerWidth;
+      var CH = vw <= 380 ? 270 : (vw <= 640 ? 290 : 290);
 
       cards.forEach(function(c, i){
         c.style.width  = CW + 'px';
