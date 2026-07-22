@@ -1282,21 +1282,14 @@ body.admin-mode .admin-stats { visibility:visible; opacity:1; pointer-events:aut
   width:40%; animation:nw-tube-sheen 2.6s ease-in-out infinite;
 }
 @keyframes nw-tube-sheen { 0%{transform:translateX(-120%)} 100%{transform:translateX(280%)} }
-.nw-tube-pct {
-  font-family:var(--mono); font-size:.66rem; font-weight:700; color:#ff9466;
-  min-width:2.4em; text-align:right; flex-shrink:0;
-}
-.nw-progress-text { font-size:.7rem; color:var(--muted); font-weight:500; }
-.nw-progress-text.empty { font-style:italic; opacity:.55; }
 
 .nw-admin-btns { position:absolute; top:.4rem; right:.4rem; display:none; gap:.3rem; z-index:2; }
 body.admin-mode .nw-admin-btns { display:flex; }
-.nw-edit-btn, .nw-stop-btn {
+.nw-stop-btn {
   width:1.5rem; height:1.5rem; border-radius:9999px; display:flex; align-items:center; justify-content:center;
   font-size:.62rem; background:oklch(0.09 0.02 260/.9); border:1px solid oklch(1 0 0/.16);
   color:var(--fg); cursor:pointer; transition:all .15s;
 }
-.nw-edit-btn:hover { border-color:oklch(0.76 0.17 195/.5); color:var(--accent); }
 .nw-stop-btn:hover { background:oklch(0.65 0.22 25/.85); color:#fff; }
 
 /* ── Watching toggle on grid cards ── */
@@ -1695,32 +1688,19 @@ async function deleteMovie(id) {
   await dbFetch(`/movies?id=eq.${id}`, { method: "DELETE" });
 }
 
-async function setWatching(id, isWatching, percent = 50, note = null) {
+async function setWatching(id, isWatching, percent = null) {
+  const pct = isWatching ? (percent ?? randomPercent()) : null;
   await dbFetch(`/movies?id=eq.${id}`, {
     method:  "PATCH",
     headers: { "Prefer": "return=minimal" },
     body:    JSON.stringify({
       status: isWatching ? "watching" : "watched",
-      progress_percent: isWatching ? clampPct(percent) : null,
-      progress_note: isWatching ? (note || null) : null,
+      progress_percent: pct,
+      progress_note: null,
     }),
   });
   const m = movies.find(m => m.id === id);
-  if (m) {
-    m.status = isWatching ? "watching" : "watched";
-    m.progress_percent = isWatching ? clampPct(percent) : null;
-    m.progress_note = isWatching ? (note || null) : null;
-  }
-}
-
-async function updateProgress(id, percent, note) {
-  await dbFetch(`/movies?id=eq.${id}`, {
-    method:  "PATCH",
-    headers: { "Prefer": "return=minimal" },
-    body:    JSON.stringify({ progress_percent: clampPct(percent), progress_note: note || null }),
-  });
-  const m = movies.find(m => m.id === id);
-  if (m) { m.progress_percent = clampPct(percent); m.progress_note = note || null; }
+  if (m) { m.status = isWatching ? "watching" : "watched"; m.progress_percent = pct; m.progress_note = null; }
 }
 
 function clampPct(v) {
@@ -1729,13 +1709,9 @@ function clampPct(v) {
   return Math.max(0, Math.min(100, n));
 }
 
-// Small shared prompt flow used by every "mark as watching" trigger
-function askProgress(defaults = { percent: 50, note: "" }) {
-  const pctRaw = prompt("Progress — enter a percentage (0–100)", String(defaults.percent));
-  if (pctRaw === null) return null; // cancelled
-  const percent = clampPct(pctRaw);
-  const note = prompt("Optional label (e.g. \"Season 2, Episode 4\") — leave blank to skip", defaults.note || "");
-  return { percent, note: note === null ? (defaults.note || "") : note.trim() };
+// A believable-looking random fill so no one has to type a number in
+function randomPercent() {
+  return Math.floor(Math.random() * 61) + 20; // 20–80
 }
 
 // ── Render: Now Watching spotlight ──
@@ -1760,7 +1736,6 @@ function renderNowWatching() {
     const safeTitle = esc(m.title);
     const safeId    = esc(m.id);
     const isTV      = (m.media_type || "movie") === "tv";
-    const note      = m.progress_note ? esc(m.progress_note) : "";
     const pct       = clampPct(m.progress_percent);
 
     const poster = m.poster_path
@@ -1775,31 +1750,14 @@ function renderNowWatching() {
           <div class="nw-title">${safeTitle}</div>
           <div class="nw-tube-row">
             <div class="nw-tube-track"><div class="nw-tube-fill" style="width:${pct}%"></div></div>
-            <span class="nw-tube-pct">${pct}%</span>
           </div>
-          <div class="nw-progress-text ${note ? "" : "empty"}">${note || "no label added"}</div>
         </div>
         <div class="nw-admin-btns">
-          <button class="nw-edit-btn" data-id="${safeId}" title="Update progress">✎</button>
           <button class="nw-stop-btn" data-id="${safeId}" title="Mark as finished">✕</button>
         </div>
       </div>`;
   }).join("");
 
-  track.querySelectorAll(".nw-edit-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const id = parseInt(btn.dataset.id);
-      const m  = movies.find(m => m.id === id);
-      if (!m) return;
-      const result = askProgress({ percent: clampPct(m.progress_percent), note: m.progress_note || "" });
-      if (result === null) return;
-      try {
-        await updateProgress(id, result.percent, result.note);
-        renderNowWatching();
-        showToast("✎", "Progress updated");
-      } catch { showToast("⚠️", "Could not update progress"); }
-    });
-  });
   track.querySelectorAll(".nw-stop-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
       const id = parseInt(btn.dataset.id);
@@ -1967,14 +1925,8 @@ function renderGrid() {
         const id = parseInt(btn.dataset.id);
         const currentlyWatching = btn.dataset.watching === "true";
         const turningOn = !currentlyWatching;
-        let percent = 50, note = "";
-        if (turningOn) {
-          const result = askProgress();
-          if (result === null) return;
-          percent = result.percent; note = result.note;
-        }
         try {
-          await setWatching(id, turningOn, percent, note);
+          await setWatching(id, turningOn);
           renderNowWatching();
           renderGrid();
           showToast(turningOn ? "▶" : "✅", turningOn ? "Added to Watching Now" : "Marked as finished");
@@ -2132,14 +2084,8 @@ function renderGrid() {
       const id = parseInt(btn.dataset.id);
       const currentlyWatching = btn.dataset.watching === "true";
       const turningOn = !currentlyWatching;
-      let percent = 50, note = "";
-      if (turningOn) {
-        const result = askProgress();
-        if (result === null) return; // cancelled
-        percent = result.percent; note = result.note;
-      }
       try {
-        await setWatching(id, turningOn, percent, note);
+        await setWatching(id, turningOn);
         renderNowWatching();
         renderGrid();
         showToast(turningOn ? "▶" : "✅", turningOn ? "Added to Watching Now" : "Marked as finished");
