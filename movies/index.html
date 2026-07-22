@@ -1254,17 +1254,40 @@ body.admin-mode .admin-stats { visibility:visible; opacity:1; pointer-events:aut
   background:linear-gradient(160deg, oklch(0.2 0.06 260), oklch(0.12 0.04 260));
   font-family:var(--display); font-weight:800; color:rgba(255,255,255,.2); font-size:1.2rem;
 }
-.nw-body { flex:1; min-width:0; padding:.8rem .95rem; display:flex; flex-direction:column; gap:.3rem; justify-content:center; }
+.nw-body { flex:1; min-width:0; padding:.8rem .95rem; display:flex; flex-direction:column; gap:.45rem; justify-content:center; }
 .nw-toprow { display:flex; align-items:center; gap:.4rem; }
 .nw-type {
   font-size:.56rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase;
   color:oklch(0.6 0.05 270); background:oklch(1 0 0/6%); padding:.1rem .4rem; border-radius:.3rem;
 }
 .nw-title { font-family:var(--display); font-weight:700; font-size:.92rem; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.nw-progress-text { font-size:.72rem; color:var(--muted); font-weight:500; }
+
+/* Floating tube progress bar — centered in the card body */
+.nw-tube-row { display:flex; align-items:center; gap:.55rem; margin:.1rem 0; }
+.nw-tube-track {
+  position:relative; flex:1; height:.55rem; border-radius:9999px;
+  background:oklch(0.08 0.02 260/.9);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.6), 0 1px 0 rgba(255,255,255,.04);
+  overflow:hidden;
+}
+.nw-tube-fill {
+  position:absolute; inset:0; width:0%; border-radius:9999px;
+  background:linear-gradient(90deg,#ff5470,#ff9466);
+  box-shadow:0 0 10px rgba(255,84,112,.55), 0 0 2px rgba(255,148,102,.6);
+  transition:width .5s cubic-bezier(.34,1.1,.64,1);
+}
+.nw-tube-fill::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+  width:40%; animation:nw-tube-sheen 2.6s ease-in-out infinite;
+}
+@keyframes nw-tube-sheen { 0%{transform:translateX(-120%)} 100%{transform:translateX(280%)} }
+.nw-tube-pct {
+  font-family:var(--mono); font-size:.66rem; font-weight:700; color:#ff9466;
+  min-width:2.4em; text-align:right; flex-shrink:0;
+}
+.nw-progress-text { font-size:.7rem; color:var(--muted); font-weight:500; }
 .nw-progress-text.empty { font-style:italic; opacity:.55; }
-.nw-bar-track { height:4px; border-radius:9999px; background:oklch(1 0 0/9%); overflow:hidden; margin-top:.2rem; }
-.nw-bar-fill { height:100%; border-radius:9999px; background:linear-gradient(90deg,#ff5470,#ff9466); transition:width .4s; }
 
 .nw-admin-btns { position:absolute; top:.4rem; right:.4rem; display:none; gap:.3rem; z-index:2; }
 body.admin-mode .nw-admin-btns { display:flex; }
@@ -1672,42 +1695,47 @@ async function deleteMovie(id) {
   await dbFetch(`/movies?id=eq.${id}`, { method: "DELETE" });
 }
 
-async function setWatching(id, isWatching, progressNote = null) {
+async function setWatching(id, isWatching, percent = 50, note = null) {
   await dbFetch(`/movies?id=eq.${id}`, {
     method:  "PATCH",
     headers: { "Prefer": "return=minimal" },
     body:    JSON.stringify({
       status: isWatching ? "watching" : "watched",
-      progress_note: isWatching ? (progressNote || null) : null,
+      progress_percent: isWatching ? clampPct(percent) : null,
+      progress_note: isWatching ? (note || null) : null,
     }),
   });
   const m = movies.find(m => m.id === id);
-  if (m) { m.status = isWatching ? "watching" : "watched"; m.progress_note = isWatching ? (progressNote || null) : null; }
+  if (m) {
+    m.status = isWatching ? "watching" : "watched";
+    m.progress_percent = isWatching ? clampPct(percent) : null;
+    m.progress_note = isWatching ? (note || null) : null;
+  }
 }
 
-async function updateProgressNote(id, note) {
+async function updateProgress(id, percent, note) {
   await dbFetch(`/movies?id=eq.${id}`, {
     method:  "PATCH",
     headers: { "Prefer": "return=minimal" },
-    body:    JSON.stringify({ progress_note: note || null }),
+    body:    JSON.stringify({ progress_percent: clampPct(percent), progress_note: note || null }),
   });
   const m = movies.find(m => m.id === id);
-  if (m) m.progress_note = note || null;
+  if (m) { m.progress_percent = clampPct(percent); m.progress_note = note || null; }
 }
 
-// Parses a progress note like "S2E4" or "62%" into a 0-100 bar width.
-// Falls back to a gentle indeterminate-looking value if it can't parse.
-function progressToPercent(note) {
-  if (!note) return null;
-  const pct = note.match(/(\d{1,3})\s*%/);
-  if (pct) return Math.max(2, Math.min(100, parseInt(pct[1])));
-  const se = note.match(/S(\d+)\s*E(\d+)/i);
-  if (se) {
-    // No total-episode info stored, so just show modest, growing progress per episode
-    const ep = parseInt(se[2]);
-    return Math.max(6, Math.min(96, ep * 8));
-  }
-  return null;
+function clampPct(v) {
+  const n = parseInt(v);
+  if (isNaN(n)) return 50;
+  return Math.max(0, Math.min(100, n));
+}
+
+// Small shared prompt flow used by every "mark as watching" trigger
+function askProgress(defaults = { percent: 50, note: "" }) {
+  const pctRaw = prompt("Progress — enter a percentage (0–100)", String(defaults.percent));
+  if (pctRaw === null) return null; // cancelled
+  const percent = clampPct(pctRaw);
+  const note = prompt("Optional label (e.g. \"Season 2, Episode 4\") — leave blank to skip", defaults.note || "");
+  return { percent, note: note === null ? (defaults.note || "") : note.trim() };
 }
 
 // ── Render: Now Watching spotlight ──
@@ -1733,7 +1761,7 @@ function renderNowWatching() {
     const safeId    = esc(m.id);
     const isTV      = (m.media_type || "movie") === "tv";
     const note      = m.progress_note ? esc(m.progress_note) : "";
-    const pct       = progressToPercent(m.progress_note);
+    const pct       = clampPct(m.progress_percent);
 
     const poster = m.poster_path
       ? `<img class="nw-poster" src="${TMDB_IMG}${esc(m.poster_path)}" alt="${safeTitle}" loading="lazy">`
@@ -1745,8 +1773,11 @@ function renderNowWatching() {
         <div class="nw-body">
           <div class="nw-toprow"><span class="nw-type">${isTV ? "TV" : "Film"}</span></div>
           <div class="nw-title">${safeTitle}</div>
-          <div class="nw-progress-text ${note ? "" : "empty"}">${note || "no progress noted"}</div>
-          ${pct !== null ? `<div class="nw-bar-track"><div class="nw-bar-fill" style="width:${pct}%"></div></div>` : ""}
+          <div class="nw-tube-row">
+            <div class="nw-tube-track"><div class="nw-tube-fill" style="width:${pct}%"></div></div>
+            <span class="nw-tube-pct">${pct}%</span>
+          </div>
+          <div class="nw-progress-text ${note ? "" : "empty"}">${note || "no label added"}</div>
         </div>
         <div class="nw-admin-btns">
           <button class="nw-edit-btn" data-id="${safeId}" title="Update progress">✎</button>
@@ -1760,10 +1791,10 @@ function renderNowWatching() {
       const id = parseInt(btn.dataset.id);
       const m  = movies.find(m => m.id === id);
       if (!m) return;
-      const note = prompt("Progress note (e.g. \"S2E4\" or \"62%\")", m.progress_note || "");
-      if (note === null) return;
+      const result = askProgress({ percent: clampPct(m.progress_percent), note: m.progress_note || "" });
+      if (result === null) return;
       try {
-        await updateProgressNote(id, note.trim());
+        await updateProgress(id, result.percent, result.note);
         renderNowWatching();
         showToast("✎", "Progress updated");
       } catch { showToast("⚠️", "Could not update progress"); }
@@ -1936,13 +1967,14 @@ function renderGrid() {
         const id = parseInt(btn.dataset.id);
         const currentlyWatching = btn.dataset.watching === "true";
         const turningOn = !currentlyWatching;
-        let note = null;
+        let percent = 50, note = "";
         if (turningOn) {
-          note = prompt("Progress note (optional) — e.g. \"S2E4\" or \"62%\"", "");
-          if (note === null) return;
+          const result = askProgress();
+          if (result === null) return;
+          percent = result.percent; note = result.note;
         }
         try {
-          await setWatching(id, turningOn, note);
+          await setWatching(id, turningOn, percent, note);
           renderNowWatching();
           renderGrid();
           showToast(turningOn ? "▶" : "✅", turningOn ? "Added to Watching Now" : "Marked as finished");
@@ -2100,13 +2132,14 @@ function renderGrid() {
       const id = parseInt(btn.dataset.id);
       const currentlyWatching = btn.dataset.watching === "true";
       const turningOn = !currentlyWatching;
-      let note = null;
+      let percent = 50, note = "";
       if (turningOn) {
-        note = prompt("Progress note (optional) — e.g. \"S2E4\" or \"62%\"", "");
-        if (note === null) return; // cancelled
+        const result = askProgress();
+        if (result === null) return; // cancelled
+        percent = result.percent; note = result.note;
       }
       try {
-        await setWatching(id, turningOn, note);
+        await setWatching(id, turningOn, percent, note);
         renderNowWatching();
         renderGrid();
         showToast(turningOn ? "▶" : "✅", turningOn ? "Added to Watching Now" : "Marked as finished");
