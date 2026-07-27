@@ -416,8 +416,22 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     cards.forEach(function(c,i){
-      c.addEventListener('click', function(){ if(!dragging) goTo(i); });
+      c.addEventListener('click', function(e){
+        // Let links/buttons inside the card (e.g. "View project", "Chat with my AI") act normally
+        if (e.target.closest('a, button')) return;
+        if(!dragging) goTo(i);
+      });
     });
+
+    // Belt-and-suspenders: intercept in the CAPTURE phase (before any other
+    // handler on the way down) so nothing between the click and the anchor
+    // can swallow it, and stop it from ever reaching the drag/goTo logic.
+    cardsEl.addEventListener('pointerdown', function(e){
+      if (e.target.closest('a, button')) e.stopPropagation();
+    }, true);
+    cardsEl.addEventListener('click', function(e){
+      if (e.target.closest('a, button')) e.stopPropagation();
+    }, true);
 
     var prevBtn = document.getElementById('cfPrev');
     var nextBtn = document.getElementById('cfNext');
@@ -440,8 +454,11 @@ document.addEventListener("DOMContentLoaded", function () {
       sw.addEventListener('pointerenter', function(){ hovering=true;  layout(); });
       sw.addEventListener('pointerleave', function(){ hovering=false; layout(); });
       sw.addEventListener('pointerdown', function(e){
+        // Don't hijack pointer capture when the press starts on a link/button —
+        // this is what was blocking clicks/taps on "View project" links.
+        if (e.target.closest('a, button')) return;
         dragging=true; dragX=e.clientX; lastX=e.clientX; lastT=Date.now(); vel=0;
-        sw.setPointerCapture(e.pointerId);
+        try { sw.setPointerCapture(e.pointerId); } catch(err) {}
       });
       sw.addEventListener('pointermove', function(e){
         if(!dragging) return;
@@ -518,4 +535,15 @@ document.addEventListener("DOMContentLoaded", function () {
   } else {
     init();
   }
+})();
+
+// --------- Cover Flow: "Chat with my AI" trigger opens the bottom chat widget ---------
+(function cfChatTrigger(){
+  document.querySelectorAll('.cf-chat-trigger').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation(); // don't let the carousel treat this as a card click
+      var aiBtn = document.getElementById('aiChatBtn');
+      if (aiBtn) aiBtn.click(); // reuses the existing open/close logic + iframe lazy-load
+    });
+  });
 })();
