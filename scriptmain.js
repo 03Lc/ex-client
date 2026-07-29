@@ -400,7 +400,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 // --------- Cover Flow Carousel ---------
 (function coverFlow(){
-  var cur = 0, dragging = false, dragX = 0, vel = 0, lastX = 0, lastT = 0, hovering = false;
+  var cur = 0, dragging = false, dragX = 0, vel = 0, lastX = 0, lastT = 0, hovering = false, dragMoved = false;
 
   function init(){
     var cardsEl = document.getElementById('cfCards');
@@ -417,26 +417,38 @@ document.addEventListener("DOMContentLoaded", function () {
 
     cards.forEach(function(c,i){
       c.addEventListener('click', function(e){
-        // Let links/buttons inside the card (e.g. "View project", "Chat with my AI") act normally
-        if (e.target.closest('a, button')) return;
-        if(!dragging) goTo(i);
+        if(dragging) return;
+        // Ignore the click that ends a swipe/drag so it doesn't also open a link
+        if(dragMoved){ dragMoved = false; return; }
+        if(e.target.closest('a,button')) return; // let links/buttons handle their own click
+
+        // Card already centered/active — clicking anywhere on it opens its project link.
+        if(i === cur){
+          var link = c.querySelector('.cf-link');
+          if(link) window.open(link.href, link.target || '_blank', 'noopener,noreferrer');
+          return;
+        }
+
+        // Side card — bring it to the center first, don't open its link yet.
+        goTo(i);
       });
     });
-
-    // Belt-and-suspenders: intercept in the CAPTURE phase (before any other
-    // handler on the way down) so nothing between the click and the anchor
-    // can swallow it, and stop it from ever reaching the drag/goTo logic.
-    cardsEl.addEventListener('pointerdown', function(e){
-      if (e.target.closest('a, button')) e.stopPropagation();
-    }, true);
-    cardsEl.addEventListener('click', function(e){
-      if (e.target.closest('a, button')) e.stopPropagation();
-    }, true);
 
     var prevBtn = document.getElementById('cfPrev');
     var nextBtn = document.getElementById('cfNext');
     if(prevBtn) prevBtn.addEventListener('click', function(){ goTo(cur-1); });
     if(nextBtn) nextBtn.addEventListener('click', function(){ goTo(cur+1); });
+
+    // "Chat with the AI" button on the Portfolio AI Chatbot card opens the
+    // existing chat widget instead of being a dead "in progress" label.
+    var aiOpenBtn = document.getElementById('cfOpenAI');
+    if(aiOpenBtn){
+      aiOpenBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var chatBtn = document.getElementById('aiChatBtn');
+        if(chatBtn) chatBtn.click();
+      });
+    }
 
     document.addEventListener('keydown', function(e){
       if(e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
@@ -454,14 +466,13 @@ document.addEventListener("DOMContentLoaded", function () {
       sw.addEventListener('pointerenter', function(){ hovering=true;  layout(); });
       sw.addEventListener('pointerleave', function(){ hovering=false; layout(); });
       sw.addEventListener('pointerdown', function(e){
-        // Don't hijack pointer capture when the press starts on a link/button —
-        // this is what was blocking clicks/taps on "View project" links.
-        if (e.target.closest('a, button')) return;
-        dragging=true; dragX=e.clientX; lastX=e.clientX; lastT=Date.now(); vel=0;
-        try { sw.setPointerCapture(e.pointerId); } catch(err) {}
+        if(e.target.closest('a,button')) return; // don't capture the pointer for interactive elements
+        dragging=true; dragX=e.clientX; lastX=e.clientX; lastT=Date.now(); vel=0; dragMoved=false;
+        sw.setPointerCapture(e.pointerId);
       });
       sw.addEventListener('pointermove', function(e){
         if(!dragging) return;
+        if(Math.abs(e.clientX-dragX) > 5) dragMoved = true;
         var now=Date.now(), dt=Math.max(1,now-lastT);
         vel=(e.clientX-lastX)/dt*16; lastX=e.clientX; lastT=now;
       });
@@ -535,15 +546,4 @@ document.addEventListener("DOMContentLoaded", function () {
   } else {
     init();
   }
-})();
-
-// --------- Cover Flow: "Chat with my AI" trigger opens the bottom chat widget ---------
-(function cfChatTrigger(){
-  document.querySelectorAll('.cf-chat-trigger').forEach(function(btn){
-    btn.addEventListener('click', function(e){
-      e.stopPropagation(); // don't let the carousel treat this as a card click
-      var aiBtn = document.getElementById('aiChatBtn');
-      if (aiBtn) aiBtn.click(); // reuses the existing open/close logic + iframe lazy-load
-    });
-  });
 })();
