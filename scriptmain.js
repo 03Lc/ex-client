@@ -418,18 +418,19 @@ document.addEventListener("DOMContentLoaded", function () {
     cards.forEach(function(c,i){
       c.addEventListener('click', function(e){
         if(dragging) return;
-        // Ignore the click that ends a swipe/drag so it doesn't also open a link
+        // Ignore the click that ends a swipe/drag so it doesn't also trigger the card's action
         if(dragMoved){ dragMoved = false; return; }
-        if(e.target.closest('a,button')) return; // let links/buttons handle their own click
+        if(e.target.closest('a,button')) return; // clicking the link/button directly works natively already
 
-        // Card already centered/active — clicking anywhere on it opens its project link.
+        // Card already centered/active — clicking anywhere on it triggers its action:
+        // simulates a real click on the card's <a> (opens the URL) or <button> (e.g. opens AI chat).
         if(i === cur){
-          var link = c.querySelector('.cf-link');
-          if(link) window.open(link.href, link.target || '_blank', 'noopener,noreferrer');
+          var action = c.querySelector('.cf-link');
+          if(action) action.click();
           return;
         }
 
-        // Side card — bring it to the center first, don't open its link yet.
+        // Side card — bring it to the center first, don't trigger its action yet.
         goTo(i);
       });
     });
