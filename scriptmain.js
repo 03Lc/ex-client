@@ -415,25 +415,12 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    cards.forEach(function(c,i){
-      c.addEventListener('click', function(e){
-        if(dragging) return;
-        // Ignore the click that ends a swipe/drag so it doesn't also trigger the card's action
-        if(dragMoved){ dragMoved = false; return; }
-        if(e.target.closest('a,button')) return; // clicking the link/button directly works natively already
-
-        // Card already centered/active — clicking anywhere on it triggers its action:
-        // simulates a real click on the card's <a> (opens the URL) or <button> (e.g. opens AI chat).
-        if(i === cur){
-          var action = c.querySelector('.cf-link');
-          if(action) action.click();
-          return;
-        }
-
-        // Side card — bring it to the center first, don't trigger its action yet.
-        goTo(i);
-      });
-    });
+    // NOTE: click delegation for the cards themselves happens further down,
+    // attached to the stage-wrap (see sw.addEventListener('click', ...)).
+    // It can't live on the individual .cf-card elements: once a drag/swipe
+    // starts, sw.setPointerCapture() causes the browser to retarget the
+    // resulting 'click' event to the stage-wrap itself, so a listener on a
+    // descendant card would simply never receive it.
 
     var prevBtn = document.getElementById('cfPrev');
     var nextBtn = document.getElementById('cfNext');
@@ -463,6 +450,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     var sw = document.querySelector('.cf-stage-wrap');
+    var suppressDelegatedClick = false;
     if(sw){
       sw.addEventListener('pointerenter', function(){ hovering=true;  layout(); });
       sw.addEventListener('pointerleave', function(){ hovering=false; layout(); });
@@ -482,6 +470,39 @@ document.addEventListener("DOMContentLoaded", function () {
         var dx=e.clientX-dragX;
         if(Math.abs(dx)>45||Math.abs(vel)>4) goTo(cur+(dx<0?1:-1));
         vel=0;
+      });
+
+      // Real click handling for the cards. Because a drag/swipe puts pointer
+      // capture on `sw`, the eventual 'click' event's target becomes `sw`
+      // itself rather than whatever card was actually under the cursor — so
+      // we look up the true hit target via elementFromPoint instead of
+      // trusting e.target.
+      sw.addEventListener('click', function(e){
+        if(suppressDelegatedClick) return;
+        if(dragMoved){ dragMoved = false; return; }
+
+        var hitEl = document.elementFromPoint(e.clientX, e.clientY);
+        if(!hitEl) return;
+        if(hitEl.closest('a,button')) return; // a direct link/button click already navigated natively
+
+        var card = hitEl.closest('.cf-card');
+        if(!card) return;
+        var idx = cards.indexOf(card);
+        if(idx === -1) return;
+
+        if(idx === cur){
+          // Card already centered — clicking anywhere on it triggers its action:
+          // a real click on the card's <a> (opens the URL) or <button> (e.g. opens AI chat).
+          var action = card.querySelector('.cf-link');
+          if(action){
+            suppressDelegatedClick = true;
+            action.click();
+            suppressDelegatedClick = false;
+          }
+        } else {
+          // Side card — just bring it to the center.
+          goTo(idx);
+        }
       });
     }
 
