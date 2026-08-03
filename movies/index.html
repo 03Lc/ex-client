@@ -1329,7 +1329,7 @@ body.admin-mode .watching-badge { display:none; } /* admin sees the ▶ toggle s
 /* ══════════════════════════════════════
    IN MEMORIAM — plain, no card/box
 ══════════════════════════════════════ */
-.memoriam-section { display:none; margin-bottom:2.5rem; }
+.memoriam-section { display:none; margin-bottom:1.75rem; padding-bottom:1.75rem; border-bottom:1px solid oklch(1 0 0 / 6%); }
 .memoriam-section.show { display:block; animation:card-in .6s cubic-bezier(.22,1,.36,1) both; }
 
 .memoriam-card {
@@ -1467,24 +1467,6 @@ body.admin-mode .list-watch-btn { display:flex; }
     </p>
   </div>
 
-  <!-- In Memoriam -->
-  <div class="memoriam-section" id="memoriam-section">
-    <div class="memoriam-card">
-      <div class="memoriam-poster-wrap" id="memoriam-poster-wrap"></div>
-      <div class="memoriam-body">
-        <div class="memoriam-eyebrow"><span class="memoriam-flame" style="position:static;filter:none;animation:none;">🕯️</span> In loving memory</div>
-        <div class="memoriam-name">Nirmal "Nims Dai" Purja MBE</div>
-        <div class="memoriam-dates">25 July 1983 — 31 July 2026 · Broad Peak, Pakistan</div>
-        <p class="memoriam-note">
-          A Gurkha soldier turned mountaineer who climbed all fourteen of the world's 8,000m peaks — first in a record
-          <strong>six months and six days</strong>, then again without supplemental oxygen. He carried Nepal's name to
-          the summit of every one of them, and inspired a generation back home to dream past the mountains around them.
-        </p>
-        <span class="memoriam-tag">🇳🇵 Rest easy, Nims Dai. The mountains remember you.</span>
-      </div>
-    </div>
-  </div>
-
   <!-- Now Watching spotlight -->
   <div class="now-watching-section" id="now-watching-section">
     <div class="nw-head">
@@ -1567,6 +1549,24 @@ body.admin-mode .list-watch-btn { display:flex; }
       <button class="view-btn" id="view-list" aria-label="List view" title="List view">
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
       </button>
+    </div>
+  </div>
+
+  <!-- In Memoriam -->
+  <div class="memoriam-section" id="memoriam-section">
+    <div class="memoriam-card">
+      <div class="memoriam-poster-wrap" id="memoriam-poster-wrap"></div>
+      <div class="memoriam-body">
+        <div class="memoriam-eyebrow"><span class="memoriam-flame" style="position:static;filter:none;animation:none;">🕯️</span> In loving memory</div>
+        <div class="memoriam-name">Nirmal "Nims Dai" Purja MBE</div>
+        <div class="memoriam-dates">25 July 1983 — 31 July 2026 · Broad Peak, Pakistan</div>
+        <p class="memoriam-note">
+          A Gurkha soldier turned mountaineer who climbed all fourteen of the world's 8,000m peaks — first in a record
+          <strong>six months and six days</strong>, then again without supplemental oxygen. He carried Nepal's name to
+          the summit of every one of them, and inspired a generation back home to dream past the mountains around them.
+        </p>
+        <span class="memoriam-tag">🇳🇵 Rest easy, Nims Dai. The mountains remember you.</span>
+      </div>
     </div>
   </div>
 
