@@ -2135,7 +2135,6 @@ function renderGrid() {
     const isWatching = m.status === "watching";
     const safeWatching = isWatching ? "true" : "false";
     const watchingBadge = isWatching ? `<span class="watching-badge"><span class="wb-dot"></span>Watching</span>` : "";
-    const tributeMark = isTribute(m) ? `<span class="tribute-mark" tabindex="0" data-tribute="${esc(TRIBUTE_NOTE)}" aria-label="${esc(TRIBUTE_NOTE)}">⛰</span>` : "";
 
     const posterInnerHtml = `
           ${poster}
@@ -2147,8 +2146,7 @@ function renderGrid() {
           <button class="card-star-btn ${starClass}" data-id="${safeId}" data-fav="${safeFav}" title="${m.fav ? "Unstar" : "Star"}">★</button>
           <button class="card-watch-btn ${isWatching ? "on" : ""}" data-id="${safeId}" data-watching="${safeWatching}" title="${isWatching ? "Mark as finished" : "Mark as watching now"}">▶</button>
           ${tvBadge}
-          ${watchingBadge}
-          ${tributeMark}`;
+          ${watchingBadge}`;
 
     // The tribute title gets its words placed beside its own poster, right in the grid — not a separate section.
     if (isTribute(m)) {
@@ -2837,6 +2835,7 @@ loadMovies();
     RAF = requestAnimationFrame(() => {
       const card = e.target.closest(".movie-card");
       if (!card) { resetAll(); return; }
+      if (card.classList.contains("tribute-card")) return; // wide row — no tilt, keep it still
       const wrap = card.querySelector(".poster-wrap");
       if (!wrap) return;
       const r = wrap.getBoundingClientRect();
