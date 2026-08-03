@@ -1327,46 +1327,19 @@ body.admin-mode .watching-badge { display:none; } /* admin sees the ▶ toggle s
 .watching-badge .wb-dot { width:4px; height:4px; border-radius:9999px; background:#ff5470; animation:nw-pulse 1.7s ease-in-out infinite; }
 
 /* ══════════════════════════════════════
-   IN MEMORIAM — dignified tribute panel
+   IN MEMORIAM — plain, no card/box
 ══════════════════════════════════════ */
-.memoriam-section { display:none; margin-bottom:2.25rem; }
+.memoriam-section { display:none; margin-bottom:2.5rem; }
 .memoriam-section.show { display:block; animation:card-in .6s cubic-bezier(.22,1,.36,1) both; }
 
 .memoriam-card {
-  position:relative; display:flex; gap:1.5rem; align-items:stretch;
-  background:linear-gradient(160deg, oklch(0.13 0.02 90 / .55), oklch(0.10 0.015 260 / .8));
-  border:1px solid oklch(0.85 0.1 80 / .18);
-  border-radius:1.35rem; padding:1.5rem 1.75rem;
-  overflow:hidden;
-  box-shadow:0 20px 60px rgba(0,0,0,.45), 0 0 0 1px oklch(1 0 0 / .04) inset;
-}
-
-/* faint mountain silhouette watermark, bottom-right, never distracting */
-.memoriam-card::before {
-  content:'';
-  position:absolute; right:-2rem; bottom:-1.5rem; width:14rem; height:9rem;
-  background:
-    linear-gradient(135deg, transparent 48%, oklch(1 0 0 / .035) 49%, oklch(1 0 0 / .035) 50%, transparent 51%),
-    linear-gradient(45deg, transparent 58%, oklch(1 0 0 / .03) 59%, oklch(1 0 0 / .03) 60%, transparent 61%);
-  pointer-events:none;
-}
-
-/* slow, quiet flame-like glow — a candle, not a spotlight */
-.memoriam-card::after {
-  content:'';
-  position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-  box-shadow:0 0 0 1px oklch(0.85 0.12 80 / .12) inset;
-  animation:memoriam-breathe 5s ease-in-out infinite;
-}
-@keyframes memoriam-breathe {
-  0%,100% { box-shadow:0 0 0 1px oklch(0.85 0.12 80 / .10) inset; }
-  50%      { box-shadow:0 0 0 1px oklch(0.9 0.12 80 / .22) inset; }
+  position:relative; display:flex; gap:1.5rem; align-items:flex-start;
 }
 
 .memoriam-poster-wrap {
   position:relative; flex-shrink:0; width:6.5rem;
   border-radius:.85rem; overflow:hidden;
-  border:1px solid oklch(0.85 0.1 80 / .25);
+  border:1px solid oklch(0.85 0.1 80 / .2);
   box-shadow:0 10px 30px rgba(0,0,0,.5);
 }
 .memoriam-poster { width:100%; height:100%; object-fit:cover; display:block; }
@@ -1387,7 +1360,7 @@ body.admin-mode .watching-badge { display:none; } /* admin sees the ▶ toggle s
   60%      { opacity:.85; transform:scale(0.97) rotate(1deg); }
 }
 
-.memoriam-body { flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:.4rem; position:relative; z-index:1; }
+.memoriam-body { flex:1; min-width:0; display:flex; flex-direction:column; gap:.4rem; padding-top:.1rem; }
 .memoriam-eyebrow {
   display:flex; align-items:center; gap:.5rem;
   font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.2em;
@@ -1395,12 +1368,12 @@ body.admin-mode .watching-badge { display:none; } /* admin sees the ▶ toggle s
 }
 .memoriam-name {
   font-family:var(--display); font-weight:700; letter-spacing:-.02em;
-  font-size:clamp(1.15rem, 2.4vw, 1.5rem); color:var(--fg); line-height:1.2;
+  font-size:clamp(1.1rem, 2.2vw, 1.35rem); color:var(--fg); line-height:1.2;
 }
 .memoriam-dates { font-size:.72rem; color:oklch(0.7 0.03 270); font-weight:600; letter-spacing:.04em; }
 .memoriam-note {
-  font-size:.84rem; line-height:1.7; color:oklch(0.78 0.03 270);
-  max-width:56ch; margin-top:.15rem;
+  font-size:.83rem; line-height:1.7; color:oklch(0.78 0.03 270);
+  max-width:52ch; margin-top:.15rem;
 }
 .memoriam-note strong { color:var(--fg); font-weight:600; }
 .memoriam-tag {
@@ -1410,8 +1383,9 @@ body.admin-mode .watching-badge { display:none; } /* admin sees the ▶ toggle s
 }
 
 @media(max-width:560px) {
-  .memoriam-card { flex-direction:column; align-items:flex-start; padding:1.35rem; }
-  .memoriam-poster-wrap { width:5.2rem; }
+  .memoriam-card { gap:1rem; }
+  .memoriam-poster-wrap { width:4.6rem; }
+  .memoriam-name { font-size:1rem; }
 }
 
 /* ── Tribute mark — quiet memorial, no animation ── */
