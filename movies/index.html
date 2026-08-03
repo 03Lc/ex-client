@@ -1327,40 +1327,22 @@ body.admin-mode .watching-badge { display:none; } /* admin sees the ▶ toggle s
 .watching-badge .wb-dot { width:4px; height:4px; border-radius:9999px; background:#ff5470; animation:nw-pulse 1.7s ease-in-out infinite; }
 
 /* ══════════════════════════════════════
-   IN MEMORIAM — plain, no card/box
+   IN MEMORIAM — inline within the grid,
+   same poster as every other card
 ══════════════════════════════════════ */
-.memoriam-section { display:none; margin-bottom:1.75rem; padding-bottom:1.75rem; border-bottom:1px solid oklch(1 0 0 / 6%); }
-.memoriam-section.show { display:block; animation:card-in .6s cubic-bezier(.22,1,.36,1) both; }
+.movie-card.tribute-card {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1.5rem;
+  cursor: default;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid oklch(1 0 0 / 6%);
+}
+.tribute-poster-col { flex-shrink:0; width:8.5rem; display:flex; flex-direction:column; }
+.tribute-poster-col .poster-wrap { aspect-ratio:2/3; }
 
-.memoriam-card {
-  position:relative; display:flex; gap:1.5rem; align-items:flex-start;
-}
-
-.memoriam-poster-wrap {
-  position:relative; flex-shrink:0; width:6.5rem;
-  border-radius:.85rem; overflow:hidden;
-  border:1px solid oklch(0.85 0.1 80 / .2);
-  box-shadow:0 10px 30px rgba(0,0,0,.5);
-}
-.memoriam-poster { width:100%; height:100%; object-fit:cover; display:block; }
-.memoriam-poster-ph {
-  width:100%; height:100%; min-height:9.5rem; display:flex; align-items:center; justify-content:center;
-  background:linear-gradient(160deg, oklch(0.2 0.03 80), oklch(0.11 0.02 260));
-  font-size:1.6rem;
-}
-
-.memoriam-flame {
-  position:absolute; top:.4rem; left:.4rem; font-size:.7rem;
-  filter:drop-shadow(0 0 6px rgba(255,196,110,.55));
-  animation:memoriam-flicker 2.6s ease-in-out infinite;
-}
-@keyframes memoriam-flicker {
-  0%,100% { opacity:.75; transform:scale(1) rotate(0deg); }
-  30%      { opacity:1;   transform:scale(1.08) rotate(-2deg); }
-  60%      { opacity:.85; transform:scale(0.97) rotate(1deg); }
-}
-
-.memoriam-body { flex:1; min-width:0; display:flex; flex-direction:column; gap:.4rem; padding-top:.1rem; }
+.tribute-copy { flex:1; min-width:0; display:flex; flex-direction:column; gap:.4rem; padding-top:.15rem; }
 .memoriam-eyebrow {
   display:flex; align-items:center; gap:.5rem;
   font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.2em;
@@ -1373,7 +1355,7 @@ body.admin-mode .watching-badge { display:none; } /* admin sees the ▶ toggle s
 .memoriam-dates { font-size:.72rem; color:oklch(0.7 0.03 270); font-weight:600; letter-spacing:.04em; }
 .memoriam-note {
   font-size:.83rem; line-height:1.7; color:oklch(0.78 0.03 270);
-  max-width:52ch; margin-top:.15rem;
+  max-width:58ch; margin-top:.15rem;
 }
 .memoriam-note strong { color:var(--fg); font-weight:600; }
 .memoriam-tag {
@@ -1383,8 +1365,8 @@ body.admin-mode .watching-badge { display:none; } /* admin sees the ▶ toggle s
 }
 
 @media(max-width:560px) {
-  .memoriam-card { gap:1rem; }
-  .memoriam-poster-wrap { width:4.6rem; }
+  .movie-card.tribute-card { flex-direction:row; gap:1rem; }
+  .tribute-poster-col { width:5.5rem; }
   .memoriam-name { font-size:1rem; }
 }
 
@@ -1549,24 +1531,6 @@ body.admin-mode .list-watch-btn { display:flex; }
       <button class="view-btn" id="view-list" aria-label="List view" title="List view">
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
       </button>
-    </div>
-  </div>
-
-  <!-- In Memoriam -->
-  <div class="memoriam-section" id="memoriam-section">
-    <div class="memoriam-card">
-      <div class="memoriam-poster-wrap" id="memoriam-poster-wrap"></div>
-      <div class="memoriam-body">
-        <div class="memoriam-eyebrow"><span class="memoriam-flame" style="position:static;filter:none;animation:none;">🕯️</span> In loving memory</div>
-        <div class="memoriam-name">Nirmal "Nims Dai" Purja MBE</div>
-        <div class="memoriam-dates">25 July 1983 — 31 July 2026 · Broad Peak, Pakistan</div>
-        <p class="memoriam-note">
-          A Gurkha soldier turned mountaineer who climbed all fourteen of the world's 8,000m peaks — first in a record
-          <strong>six months and six days</strong>, then again without supplemental oxygen. He carried Nepal's name to
-          the summit of every one of them, and inspired a generation back home to dream past the mountains around them.
-        </p>
-        <span class="memoriam-tag">🇳🇵 Rest easy, Nims Dai. The mountains remember you.</span>
-      </div>
     </div>
   </div>
 
@@ -1858,24 +1822,6 @@ function askProgress(defaults = { percent: 50, note: "" }) {
   return { percent, note: note === null ? (defaults.note || "") : note.trim() };
 }
 
-// ── Render: In Memoriam ──
-function renderMemoriam() {
-  const section = document.getElementById("memoriam-section");
-  const posterWrap = document.getElementById("memoriam-poster-wrap");
-  if (!section || !posterWrap) return;
-
-  const tributeMovie = movies.find(isTribute);
-  if (!tributeMovie) {
-    section.classList.remove("show");
-    return;
-  }
-
-  section.classList.add("show");
-  posterWrap.innerHTML = tributeMovie.poster_path
-    ? `<img class="memoriam-poster" src="${TMDB_IMG}${esc(tributeMovie.poster_path)}" alt="${esc(tributeMovie.title)}" loading="lazy"><span class="memoriam-flame">🕯️</span>`
-    : `<div class="memoriam-poster-ph">⛰️</div><span class="memoriam-flame">🕯️</span>`;
-}
-
 // ── Render: Now Watching spotlight ──
 function renderNowWatching() {
   const section = document.getElementById("now-watching-section");
@@ -1953,7 +1899,6 @@ function renderNowWatching() {
 
 // ── Render ──
 function renderGrid() {
-  renderMemoriam();
   renderNowWatching();
   const grid = document.getElementById("movie-grid");
   const countEl = document.getElementById("page-count");
@@ -2192,9 +2137,7 @@ function renderGrid() {
     const watchingBadge = isWatching ? `<span class="watching-badge"><span class="wb-dot"></span>Watching</span>` : "";
     const tributeMark = isTribute(m) ? `<span class="tribute-mark" tabindex="0" data-tribute="${esc(TRIBUTE_NOTE)}" aria-label="${esc(TRIBUTE_NOTE)}">⛰</span>` : "";
 
-    return `
-      <div class="movie-card ${favClass} ${featClass} reveal-pending" style="${isFirstLoad ? `animation-delay:${Math.min(i*40,400)}ms` : `animation:none`}; position:relative;">
-        <div class="poster-wrap">
+    const posterInnerHtml = `
           ${poster}
           <div class="poster-overlay">
             <div class="overlay-title">${safeTitle}</div>
@@ -2205,7 +2148,37 @@ function renderGrid() {
           <button class="card-watch-btn ${isWatching ? "on" : ""}" data-id="${safeId}" data-watching="${safeWatching}" title="${isWatching ? "Mark as finished" : "Mark as watching now"}">▶</button>
           ${tvBadge}
           ${watchingBadge}
-          ${tributeMark}
+          ${tributeMark}`;
+
+    // The tribute title gets its words placed beside its own poster, right in the grid — not a separate section.
+    if (isTribute(m)) {
+      return `
+      <div class="movie-card ${favClass} tribute-card reveal-pending" style="${isFirstLoad ? `animation-delay:${Math.min(i*40,400)}ms` : `animation:none`}; position:relative;">
+        <div class="tribute-poster-col">
+          <div class="poster-wrap">${posterInnerHtml}
+          </div>
+          <div class="card-foot">
+            <div class="card-title" data-id="${safeId}" title="Double-click to rename">${safeTitle}</div>
+            <div class="card-year">${safeYear}</div>
+          </div>
+        </div>
+        <div class="tribute-copy">
+          <div class="memoriam-eyebrow">🕯️ In loving memory</div>
+          <div class="memoriam-name">Nirmal "Nims Dai" Purja MBE</div>
+          <div class="memoriam-dates">25 July 1983 — 31 July 2026 · Broad Peak, Pakistan</div>
+          <p class="memoriam-note">
+            A Gurkha soldier turned mountaineer who climbed all fourteen of the world's 8,000m peaks — first in a record
+            <strong>six months and six days</strong>, then again without supplemental oxygen. He carried Nepal's name to
+            the summit of every one of them, and inspired a generation back home to dream past the mountains around them.
+          </p>
+          <span class="memoriam-tag">🇳🇵 Rest easy, Nims Dai. The mountains remember you.</span>
+        </div>
+      </div>`;
+    }
+
+    return `
+      <div class="movie-card ${favClass} ${featClass} reveal-pending" style="${isFirstLoad ? `animation-delay:${Math.min(i*40,400)}ms` : `animation:none`}; position:relative;">
+        <div class="poster-wrap">${posterInnerHtml}
         </div>
         <div class="card-foot">
           <div class="card-title" data-id="${safeId}" title="Double-click to rename">${safeTitle}</div>
