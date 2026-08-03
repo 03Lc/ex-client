@@ -1282,14 +1282,21 @@ body.admin-mode .admin-stats { visibility:visible; opacity:1; pointer-events:aut
   width:40%; animation:nw-tube-sheen 2.6s ease-in-out infinite;
 }
 @keyframes nw-tube-sheen { 0%{transform:translateX(-120%)} 100%{transform:translateX(280%)} }
+.nw-tube-pct {
+  font-family:var(--mono); font-size:.66rem; font-weight:700; color:#ff9466;
+  min-width:2.4em; text-align:right; flex-shrink:0;
+}
+.nw-progress-text { font-size:.7rem; color:var(--muted); font-weight:500; }
+.nw-progress-text.empty { font-style:italic; opacity:.55; }
 
 .nw-admin-btns { position:absolute; top:.4rem; right:.4rem; display:none; gap:.3rem; z-index:2; }
 body.admin-mode .nw-admin-btns { display:flex; }
-.nw-stop-btn {
+.nw-edit-btn, .nw-stop-btn {
   width:1.5rem; height:1.5rem; border-radius:9999px; display:flex; align-items:center; justify-content:center;
   font-size:.62rem; background:oklch(0.09 0.02 260/.9); border:1px solid oklch(1 0 0/.16);
   color:var(--fg); cursor:pointer; transition:all .15s;
 }
+.nw-edit-btn:hover { border-color:oklch(0.76 0.17 195/.5); color:var(--accent); }
 .nw-stop-btn:hover { background:oklch(0.65 0.22 25/.85); color:#fff; }
 
 /* ── Watching toggle on grid cards ── */
@@ -1318,6 +1325,127 @@ body.admin-mode .card-watch-btn { display:flex; }
 }
 body.admin-mode .watching-badge { display:none; } /* admin sees the ▶ toggle state instead */
 .watching-badge .wb-dot { width:4px; height:4px; border-radius:9999px; background:#ff5470; animation:nw-pulse 1.7s ease-in-out infinite; }
+
+/* ══════════════════════════════════════
+   IN MEMORIAM — dignified tribute panel
+══════════════════════════════════════ */
+.memoriam-section { display:none; margin-bottom:2.25rem; }
+.memoriam-section.show { display:block; animation:card-in .6s cubic-bezier(.22,1,.36,1) both; }
+
+.memoriam-card {
+  position:relative; display:flex; gap:1.5rem; align-items:stretch;
+  background:linear-gradient(160deg, oklch(0.13 0.02 90 / .55), oklch(0.10 0.015 260 / .8));
+  border:1px solid oklch(0.85 0.1 80 / .18);
+  border-radius:1.35rem; padding:1.5rem 1.75rem;
+  overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.45), 0 0 0 1px oklch(1 0 0 / .04) inset;
+}
+
+/* faint mountain silhouette watermark, bottom-right, never distracting */
+.memoriam-card::before {
+  content:'';
+  position:absolute; right:-2rem; bottom:-1.5rem; width:14rem; height:9rem;
+  background:
+    linear-gradient(135deg, transparent 48%, oklch(1 0 0 / .035) 49%, oklch(1 0 0 / .035) 50%, transparent 51%),
+    linear-gradient(45deg, transparent 58%, oklch(1 0 0 / .03) 59%, oklch(1 0 0 / .03) 60%, transparent 61%);
+  pointer-events:none;
+}
+
+/* slow, quiet flame-like glow — a candle, not a spotlight */
+.memoriam-card::after {
+  content:'';
+  position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  box-shadow:0 0 0 1px oklch(0.85 0.12 80 / .12) inset;
+  animation:memoriam-breathe 5s ease-in-out infinite;
+}
+@keyframes memoriam-breathe {
+  0%,100% { box-shadow:0 0 0 1px oklch(0.85 0.12 80 / .10) inset; }
+  50%      { box-shadow:0 0 0 1px oklch(0.9 0.12 80 / .22) inset; }
+}
+
+.memoriam-poster-wrap {
+  position:relative; flex-shrink:0; width:6.5rem;
+  border-radius:.85rem; overflow:hidden;
+  border:1px solid oklch(0.85 0.1 80 / .25);
+  box-shadow:0 10px 30px rgba(0,0,0,.5);
+}
+.memoriam-poster { width:100%; height:100%; object-fit:cover; display:block; }
+.memoriam-poster-ph {
+  width:100%; height:100%; min-height:9.5rem; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(160deg, oklch(0.2 0.03 80), oklch(0.11 0.02 260));
+  font-size:1.6rem;
+}
+
+.memoriam-flame {
+  position:absolute; top:.4rem; left:.4rem; font-size:.7rem;
+  filter:drop-shadow(0 0 6px rgba(255,196,110,.55));
+  animation:memoriam-flicker 2.6s ease-in-out infinite;
+}
+@keyframes memoriam-flicker {
+  0%,100% { opacity:.75; transform:scale(1) rotate(0deg); }
+  30%      { opacity:1;   transform:scale(1.08) rotate(-2deg); }
+  60%      { opacity:.85; transform:scale(0.97) rotate(1deg); }
+}
+
+.memoriam-body { flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:.4rem; position:relative; z-index:1; }
+.memoriam-eyebrow {
+  display:flex; align-items:center; gap:.5rem;
+  font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.2em;
+  color:oklch(0.82 0.13 80);
+}
+.memoriam-name {
+  font-family:var(--display); font-weight:700; letter-spacing:-.02em;
+  font-size:clamp(1.15rem, 2.4vw, 1.5rem); color:var(--fg); line-height:1.2;
+}
+.memoriam-dates { font-size:.72rem; color:oklch(0.7 0.03 270); font-weight:600; letter-spacing:.04em; }
+.memoriam-note {
+  font-size:.84rem; line-height:1.7; color:oklch(0.78 0.03 270);
+  max-width:56ch; margin-top:.15rem;
+}
+.memoriam-note strong { color:var(--fg); font-weight:600; }
+.memoriam-tag {
+  display:inline-flex; align-items:center; gap:.4rem; margin-top:.5rem;
+  font-size:.68rem; font-weight:600; color:oklch(0.82 0.13 80);
+  letter-spacing:.02em;
+}
+
+@media(max-width:560px) {
+  .memoriam-card { flex-direction:column; align-items:flex-start; padding:1.35rem; }
+  .memoriam-poster-wrap { width:5.2rem; }
+}
+
+/* ── Tribute mark — quiet memorial, no animation ── */
+.tribute-mark {
+  position:absolute; z-index:4; cursor:default;
+  width:1.4rem; height:1.4rem; border-radius:9999px;
+  background:oklch(0.11 0.015 260 / .78);
+  border:1px solid oklch(1 0 0 / .13);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.62rem; color:oklch(0.78 0.01 270);
+  backdrop-filter:blur(6px);
+}
+.poster-wrap .tribute-mark { bottom:.48rem; right:.48rem; }
+.tribute-mark[data-tribute]:hover::after,
+.tribute-mark[data-tribute]:focus-visible::after {
+  content: attr(data-tribute);
+  position:absolute; bottom:120%; right:0; margin-bottom:.35rem;
+  white-space:nowrap; font-family:var(--body); font-weight:500;
+  background:oklch(0.09 0.015 260 / .97); border:1px solid oklch(1 0 0 / .12);
+  padding:.4rem .65rem; border-radius:.55rem; font-size:.68rem; color:var(--fg);
+  box-shadow:0 8px 24px rgba(0,0,0,.45);
+}
+.list-tribute-mark {
+  flex-shrink:0; font-size:.72rem; color:oklch(0.78 0.01 270); opacity:.85;
+  position:relative; cursor:default;
+}
+.list-tribute-mark[data-tribute]:hover::after {
+  content: attr(data-tribute);
+  position:absolute; bottom:130%; left:50%; transform:translateX(-50%);
+  white-space:nowrap; font-family:var(--body); font-weight:500;
+  background:oklch(0.09 0.015 260 / .97); border:1px solid oklch(1 0 0 / .12);
+  padding:.4rem .65rem; border-radius:.55rem; font-size:.68rem; color:var(--fg);
+  box-shadow:0 8px 24px rgba(0,0,0,.45); z-index:5;
+}
 
 /* ── Watching toggle on list rows ── */
 .list-watch-btn {
@@ -1363,6 +1491,24 @@ body.admin-mode .list-watch-btn { display:flex; }
       I watch for the storytelling. TV shows I pick for the world-building.
       A <span style="color:#fbbf24">★</span> means it stuck with me.
     </p>
+  </div>
+
+  <!-- In Memoriam -->
+  <div class="memoriam-section" id="memoriam-section">
+    <div class="memoriam-card">
+      <div class="memoriam-poster-wrap" id="memoriam-poster-wrap"></div>
+      <div class="memoriam-body">
+        <div class="memoriam-eyebrow"><span class="memoriam-flame" style="position:static;filter:none;animation:none;">🕯️</span> In loving memory</div>
+        <div class="memoriam-name">Nirmal "Nims Dai" Purja MBE</div>
+        <div class="memoriam-dates">25 July 1983 — 31 July 2026 · Broad Peak, Pakistan</div>
+        <p class="memoriam-note">
+          A Gurkha soldier turned mountaineer who climbed all fourteen of the world's 8,000m peaks — first in a record
+          <strong>six months and six days</strong>, then again without supplemental oxygen. He carried Nepal's name to
+          the summit of every one of them, and inspired a generation back home to dream past the mountains around them.
+        </p>
+        <span class="memoriam-tag">🇳🇵 Rest easy, Nims Dai. The mountains remember you.</span>
+      </div>
+    </div>
   </div>
 
   <!-- Now Watching spotlight -->
@@ -1581,6 +1727,13 @@ function esc(str) {
 
 let movies = [];        // loaded from Supabase
 
+// ── Tribute — quietly marks a specific title, no DB column, no admin toggle ──
+const TRIBUTE_TITLE_RE = /14\s*peaks/i;
+const TRIBUTE_NOTE = "In memory of Nirmal \u2018Nims Dai\u2019 Purja (1983\u20132026)";
+function isTribute(m) {
+  return TRIBUTE_TITLE_RE.test(m.title || "");
+}
+
 // ── Supabase helpers ──
 let _authToken = null; // set after login, cleared on sign-out
 
@@ -1688,19 +1841,32 @@ async function deleteMovie(id) {
   await dbFetch(`/movies?id=eq.${id}`, { method: "DELETE" });
 }
 
-async function setWatching(id, isWatching, percent = null) {
-  const pct = isWatching ? (percent ?? randomPercent()) : null;
+async function setWatching(id, isWatching, percent = 50, note = null) {
   await dbFetch(`/movies?id=eq.${id}`, {
     method:  "PATCH",
     headers: { "Prefer": "return=minimal" },
     body:    JSON.stringify({
       status: isWatching ? "watching" : "watched",
-      progress_percent: pct,
-      progress_note: null,
+      progress_percent: isWatching ? clampPct(percent) : null,
+      progress_note: isWatching ? (note || null) : null,
     }),
   });
   const m = movies.find(m => m.id === id);
-  if (m) { m.status = isWatching ? "watching" : "watched"; m.progress_percent = pct; m.progress_note = null; }
+  if (m) {
+    m.status = isWatching ? "watching" : "watched";
+    m.progress_percent = isWatching ? clampPct(percent) : null;
+    m.progress_note = isWatching ? (note || null) : null;
+  }
+}
+
+async function updateProgress(id, percent, note) {
+  await dbFetch(`/movies?id=eq.${id}`, {
+    method:  "PATCH",
+    headers: { "Prefer": "return=minimal" },
+    body:    JSON.stringify({ progress_percent: clampPct(percent), progress_note: note || null }),
+  });
+  const m = movies.find(m => m.id === id);
+  if (m) { m.progress_percent = clampPct(percent); m.progress_note = note || null; }
 }
 
 function clampPct(v) {
@@ -1709,9 +1875,31 @@ function clampPct(v) {
   return Math.max(0, Math.min(100, n));
 }
 
-// A believable-looking random fill so no one has to type a number in
-function randomPercent() {
-  return Math.floor(Math.random() * 61) + 20; // 20–80
+// Small shared prompt flow used by every "mark as watching" trigger
+function askProgress(defaults = { percent: 50, note: "" }) {
+  const pctRaw = prompt("Progress — enter a percentage (0–100)", String(defaults.percent));
+  if (pctRaw === null) return null; // cancelled
+  const percent = clampPct(pctRaw);
+  const note = prompt("Optional label (e.g. \"Season 2, Episode 4\") — leave blank to skip", defaults.note || "");
+  return { percent, note: note === null ? (defaults.note || "") : note.trim() };
+}
+
+// ── Render: In Memoriam ──
+function renderMemoriam() {
+  const section = document.getElementById("memoriam-section");
+  const posterWrap = document.getElementById("memoriam-poster-wrap");
+  if (!section || !posterWrap) return;
+
+  const tributeMovie = movies.find(isTribute);
+  if (!tributeMovie) {
+    section.classList.remove("show");
+    return;
+  }
+
+  section.classList.add("show");
+  posterWrap.innerHTML = tributeMovie.poster_path
+    ? `<img class="memoriam-poster" src="${TMDB_IMG}${esc(tributeMovie.poster_path)}" alt="${esc(tributeMovie.title)}" loading="lazy"><span class="memoriam-flame">🕯️</span>`
+    : `<div class="memoriam-poster-ph">⛰️</div><span class="memoriam-flame">🕯️</span>`;
 }
 
 // ── Render: Now Watching spotlight ──
@@ -1736,6 +1924,7 @@ function renderNowWatching() {
     const safeTitle = esc(m.title);
     const safeId    = esc(m.id);
     const isTV      = (m.media_type || "movie") === "tv";
+    const note      = m.progress_note ? esc(m.progress_note) : "";
     const pct       = clampPct(m.progress_percent);
 
     const poster = m.poster_path
@@ -1750,14 +1939,31 @@ function renderNowWatching() {
           <div class="nw-title">${safeTitle}</div>
           <div class="nw-tube-row">
             <div class="nw-tube-track"><div class="nw-tube-fill" style="width:${pct}%"></div></div>
+            <span class="nw-tube-pct">${pct}%</span>
           </div>
+          <div class="nw-progress-text ${note ? "" : "empty"}">${note || "no label added"}</div>
         </div>
         <div class="nw-admin-btns">
+          <button class="nw-edit-btn" data-id="${safeId}" title="Update progress">✎</button>
           <button class="nw-stop-btn" data-id="${safeId}" title="Mark as finished">✕</button>
         </div>
       </div>`;
   }).join("");
 
+  track.querySelectorAll(".nw-edit-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = parseInt(btn.dataset.id);
+      const m  = movies.find(m => m.id === id);
+      if (!m) return;
+      const result = askProgress({ percent: clampPct(m.progress_percent), note: m.progress_note || "" });
+      if (result === null) return;
+      try {
+        await updateProgress(id, result.percent, result.note);
+        renderNowWatching();
+        showToast("✎", "Progress updated");
+      } catch { showToast("⚠️", "Could not update progress"); }
+    });
+  });
   track.querySelectorAll(".nw-stop-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
       const id = parseInt(btn.dataset.id);
@@ -1773,6 +1979,7 @@ function renderNowWatching() {
 
 // ── Render ──
 function renderGrid() {
+  renderMemoriam();
   renderNowWatching();
   const grid = document.getElementById("movie-grid");
   const countEl = document.getElementById("page-count");
@@ -1852,6 +2059,8 @@ function renderGrid() {
             return `<div class="list-poster-ph" style="background:linear-gradient(135deg,oklch(0.2 0.08 ${h}),oklch(0.13 0.06 ${h2}))">${safeTitle.charAt(0)}</div>`;
           })();
 
+      const listTributeMark = isTribute(m) ? `<span class="list-tribute-mark" tabindex="0" data-tribute="${esc(TRIBUTE_NOTE)}" aria-label="${esc(TRIBUTE_NOTE)}">⛰</span>` : "";
+
       return `
         <div class="list-row ${favClass}" style="${isFirstLoad ? `animation-delay:${Math.min(i*30,350)}ms` : `animation:none`}">
           <span class="list-index">${i + 1}</span>
@@ -1864,6 +2073,7 @@ function renderGrid() {
               <span class="list-type-badge ${typeClass}">${typeLabel}</span>
             </div>
           </div>
+          ${listTributeMark}
           <span class="list-star" aria-hidden="true">★</span>
           <button class="list-star-btn ${m.fav ? "starred" : ""}" data-id="${safeId}" data-fav="${safeFav}" title="${m.fav ? "Unstar" : "Star"}">★</button>
           <button class="list-watch-btn ${isWatching ? "on" : ""}" data-id="${safeId}" data-watching="${safeWatching}" title="${isWatching ? "Mark as finished" : "Mark as watching now"}">▶</button>
@@ -1925,8 +2135,14 @@ function renderGrid() {
         const id = parseInt(btn.dataset.id);
         const currentlyWatching = btn.dataset.watching === "true";
         const turningOn = !currentlyWatching;
+        let percent = 50, note = "";
+        if (turningOn) {
+          const result = askProgress();
+          if (result === null) return;
+          percent = result.percent; note = result.note;
+        }
         try {
-          await setWatching(id, turningOn);
+          await setWatching(id, turningOn, percent, note);
           renderNowWatching();
           renderGrid();
           showToast(turningOn ? "▶" : "✅", turningOn ? "Added to Watching Now" : "Marked as finished");
@@ -2000,6 +2216,7 @@ function renderGrid() {
     const isWatching = m.status === "watching";
     const safeWatching = isWatching ? "true" : "false";
     const watchingBadge = isWatching ? `<span class="watching-badge"><span class="wb-dot"></span>Watching</span>` : "";
+    const tributeMark = isTribute(m) ? `<span class="tribute-mark" tabindex="0" data-tribute="${esc(TRIBUTE_NOTE)}" aria-label="${esc(TRIBUTE_NOTE)}">⛰</span>` : "";
 
     return `
       <div class="movie-card ${favClass} ${featClass} reveal-pending" style="${isFirstLoad ? `animation-delay:${Math.min(i*40,400)}ms` : `animation:none`}; position:relative;">
@@ -2014,6 +2231,7 @@ function renderGrid() {
           <button class="card-watch-btn ${isWatching ? "on" : ""}" data-id="${safeId}" data-watching="${safeWatching}" title="${isWatching ? "Mark as finished" : "Mark as watching now"}">▶</button>
           ${tvBadge}
           ${watchingBadge}
+          ${tributeMark}
         </div>
         <div class="card-foot">
           <div class="card-title" data-id="${safeId}" title="Double-click to rename">${safeTitle}</div>
@@ -2084,8 +2302,14 @@ function renderGrid() {
       const id = parseInt(btn.dataset.id);
       const currentlyWatching = btn.dataset.watching === "true";
       const turningOn = !currentlyWatching;
+      let percent = 50, note = "";
+      if (turningOn) {
+        const result = askProgress();
+        if (result === null) return; // cancelled
+        percent = result.percent; note = result.note;
+      }
       try {
-        await setWatching(id, turningOn);
+        await setWatching(id, turningOn, percent, note);
         renderNowWatching();
         renderGrid();
         showToast(turningOn ? "▶" : "✅", turningOn ? "Added to Watching Now" : "Marked as finished");
