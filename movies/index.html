@@ -228,23 +228,6 @@ body.admin-mode .card-star-btn:hover { transform:scale(1.15); border-color:oklch
 /* ── Type filter pills ── */
 /* type-pill styles moved to command bar section */
 
-/* ── Modal type tabs ── */
-.modal-type-tabs {
-  display:flex; gap:.4rem; margin-bottom:1.1rem;
-  background:oklch(0.11 0.025 260); border:1px solid var(--border);
-  border-radius:.75rem; padding:.3rem;
-}
-.modal-type-tab {
-  flex:1; padding:.5rem; border-radius:.5rem; font-size:.82rem; font-weight:700;
-  color:var(--muted); cursor:pointer; transition:all .2s; text-align:center; border:none;
-  background:none;
-}
-.modal-type-tab.active {
-  background:var(--card); color:var(--fg);
-  box-shadow:0 1px 4px rgba(0,0,0,.3);
-}
-.modal-type-tab.active[data-type="tv"] { color:var(--tv-col); }
-.modal-type-tab.active[data-type="movie"] { color:var(--accent); }
 body.admin-mode .movie-card:hover .poster-wrap { border-color:oklch(0.72 0.2 290/.5); }
 body.admin-mode .movie-card.fav:hover .poster-wrap { border-color:oklch(0.82 0.2 55 / .9); }
 /* Admin: show overlay so title is visible even without hover (helps with rename) */
@@ -575,18 +558,6 @@ body.admin-mode #admin-bar { display:flex; }
 }
 .admin-btn svg { flex-shrink:0; }
 
-.admin-btn-add {
-  background:var(--grad);
-  color:oklch(0.08 0.02 270);
-  box-shadow:0 2px 12px oklch(0.65 0.2 270/.4), 0 1px 0 oklch(1 0 0/.25) inset;
-}
-.admin-btn-add:hover {
-  filter:brightness(1.08);
-  box-shadow:0 4px 20px oklch(0.65 0.2 270/.55), 0 1px 0 oklch(1 0 0/.25) inset;
-  transform:translateY(-1px);
-}
-.admin-btn-add:active { transform:translateY(0); filter:brightness(.95); }
-
 .admin-btn-bulk {
   background:oklch(0.15 0.03 270);
   color:oklch(0.75 0.06 270);
@@ -687,13 +658,13 @@ body.admin-mode::before {
 /* ══════════════════════════════════════
    MODALS — redesigned
 ══════════════════════════════════════ */
-#add-modal, #bulk-modal {
+#bulk-modal {
   position:fixed; inset:0; z-index:300; display:none;
   align-items:center; justify-content:center; padding:1.5rem;
   background:oklch(0.06 0.02 260/.85);
   backdrop-filter:blur(8px);
 }
-#add-modal.open, #bulk-modal.open { display:flex; animation:fade-in .22s ease both; }
+#bulk-modal.open { display:flex; animation:fade-in .22s ease both; }
 @keyframes fade-in { from{opacity:0} to{opacity:1} }
 
 .modal-card, .bulk-card {
@@ -743,73 +714,8 @@ body.admin-mode::before {
 }
 .field input::placeholder, .field textarea::placeholder { color:oklch(0.45 0.03 270); }
 
-/* TMDB search results */
-#tmdb-results {
-  display:none; flex-direction:column;
-  background:oklch(0.09 0.02 265); border:1px solid oklch(1 0 0/.1);
-  border-radius:.85rem; overflow:hidden; margin-top:.4rem;
-  max-height:240px; overflow-y:auto;
-  box-shadow:0 8px 24px rgba(0,0,0,.3);
-}
-#tmdb-results.open { display:flex; }
-.tmdb-result {
-  display:flex; align-items:center; gap:.75rem;
-  padding:.6rem .9rem; cursor:pointer; transition:background .13s;
-  border-bottom:1px solid oklch(1 0 0/.07);
-}
-.tmdb-result:last-child { border-bottom:none; }
-.tmdb-result:hover { background:oklch(0.14 0.03 270); }
-.tmdb-thumb { width:36px; height:54px; border-radius:.45rem; object-fit:cover; flex-shrink:0; background:var(--card); }
-.tmdb-thumb-ph { width:36px; height:54px; border-radius:.45rem; background:var(--card); display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--muted); font-size:.6rem; }
-.tmdb-info { display:flex; flex-direction:column; gap:.18rem; min-width:0; }
-.tmdb-name { font-size:.82rem; font-weight:600; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.tmdb-year { font-size:.7rem; color:var(--muted); }
-.tmdb-searching { padding:.8rem; font-size:.78rem; color:var(--muted); text-align:center; }
-
-/* Selected preview */
-#selected-preview {
-  display:none; align-items:center; gap:.8rem;
-  background:oklch(0.09 0.02 265); border:1px solid oklch(0.76 0.17 195/.25);
-  border-radius:.85rem; padding:.8rem; margin-bottom:1rem;
-  box-shadow:0 0 0 1px oklch(0.76 0.17 195/.08);
-}
-#selected-preview.show { display:flex; }
-.preview-poster { width:44px; height:66px; border-radius:.5rem; object-fit:cover; flex-shrink:0; background:var(--card); aspect-ratio:2/3; }
-.preview-info { flex:1; min-width:0; }
-.preview-title { font-size:.85rem; font-weight:600; color:var(--fg); }
-.preview-year  { font-size:.72rem; color:var(--muted); margin-top:.15rem; }
-.preview-clear { color:var(--muted); font-size:.85rem; padding:.3rem; border-radius:.4rem; transition:all .15s; cursor:pointer; flex-shrink:0; background:oklch(0.15 0.02 270); border:1px solid oklch(1 0 0/.1); }
-.preview-clear:hover { color:var(--fg); background:oklch(0.2 0.03 270); }
-
-/* Fav toggle */
-.modal-fav-row { display:flex; align-items:center; gap:.75rem; margin-bottom:1.25rem; }
-.fav-toggle {
-  display:flex; align-items:center; gap:.55rem;
-  background:oklch(0.09 0.02 265); border:1px solid oklch(1 0 0/.1);
-  border-radius:.75rem; padding:.55rem .9rem; cursor:pointer;
-  transition:all .2s; font-size:.82rem; color:var(--muted); flex:1;
-}
-.fav-toggle.on { border-color:oklch(0.85 0.18 85/.5); color:#fbbf24; background:oklch(0.12 0.05 85/.15); }
-.fav-toggle-star { font-size:1rem; transition:transform .2s; }
-.fav-toggle.on .fav-toggle-star { transform:scale(1.2); }
-.fav-toggle-label { font-size:.78rem; font-weight:600; }
-
 /* Actions */
 .modal-actions { display:flex; gap:.55rem; margin-top:.25rem; }
-.modal-btn-save {
-  flex:1; background:var(--grad); color:oklch(0.08 0.02 270);
-  padding:.72rem; border-radius:.8rem; font-size:.84rem; font-weight:700;
-  box-shadow:0 2px 16px oklch(0.65 0.2 270/.35);
-  transition:transform .18s, box-shadow .18s, filter .18s; cursor:pointer; border:none;
-  letter-spacing:.01em;
-}
-.modal-btn-save:hover {
-  filter:brightness(1.07);
-  box-shadow:0 4px 24px oklch(0.65 0.2 270/.5);
-  transform:translateY(-1px);
-}
-.modal-btn-save:active { transform:translateY(0); filter:brightness(.95); }
-.modal-btn-save:disabled { opacity:.4; cursor:not-allowed; transform:none; filter:none; box-shadow:none; }
 .modal-btn-cancel {
   padding:.72rem 1.25rem; border-radius:.8rem; font-size:.84rem; font-weight:600;
   border:1px solid oklch(1 0 0/.1); color:oklch(0.55 0.04 270); background:oklch(0.15 0.02 270);
@@ -1096,8 +1002,6 @@ body.admin-mode .admin-stats { visibility:visible; opacity:1; pointer-events:aut
   font-size:.58rem; font-weight:800; text-transform:uppercase;
   letter-spacing:.18em; color:oklch(0.48 0.04 270);
 }
-/* Remove old stat-div elements if any remain */
-.stat-div { display:none; }
 
 /* ── Bulk type toggle ── */
 .bulk-type-toggle {
@@ -1122,13 +1026,6 @@ body.admin-mode .admin-stats { visibility:visible; opacity:1; pointer-events:aut
 .bulk-type-btn[data-type="movie"].active { color:var(--accent); }
 
 /* ── Bulk import modal ── */
-#bulk-modal {
-  position:fixed; inset:0; z-index:300; display:none;
-  align-items:center; justify-content:center; padding:1.5rem;
-  background:oklch(0.06 0.02 260/.85);
-  backdrop-filter:blur(8px);
-}
-#bulk-modal.open { display:flex; animation:fade-in .22s ease both; }
 #bulk-textarea {
   width:100%; background:oklch(0.09 0.02 265); border:1px solid oklch(1 0 0/.1);
   border-radius:.75rem; padding:.75rem .9rem; font-size:.83rem; color:var(--fg);
