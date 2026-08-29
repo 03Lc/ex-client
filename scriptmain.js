@@ -455,7 +455,7 @@ document.addEventListener("DOMContentLoaded", function () {
       sw.addEventListener('pointerenter', function(){ hovering=true;  layout(); });
       sw.addEventListener('pointerleave', function(){ hovering=false; layout(); });
       sw.addEventListener('pointerdown', function(e){
-        if(e.target.closest('a,button')) return; // don't capture the pointer for interactive elements
+        if(e.target.closest('a,button')) return;
         dragging=true; dragX=e.clientX; lastX=e.clientX; lastT=Date.now(); vel=0; dragMoved=false;
         sw.setPointerCapture(e.pointerId);
       });
@@ -472,27 +472,17 @@ document.addEventListener("DOMContentLoaded", function () {
         vel=0;
       });
 
-      // Real click handling for the cards. Because a drag/swipe puts pointer
-      // capture on `sw`, the eventual 'click' event's target becomes `sw`
-      // itself rather than whatever card was actually under the cursor — so
-      // we look up the true hit target via elementFromPoint instead of
-      // trusting e.target.
       sw.addEventListener('click', function(e){
         if(suppressDelegatedClick) return;
         if(dragMoved){ dragMoved = false; return; }
-
         var hitEl = document.elementFromPoint(e.clientX, e.clientY);
         if(!hitEl) return;
-        if(hitEl.closest('a,button')) return; // a direct link/button click already navigated natively
-
+        if(hitEl.closest('a,button')) return;
         var card = hitEl.closest('.cf-card');
         if(!card) return;
         var idx = cards.indexOf(card);
         if(idx === -1) return;
-
         if(idx === cur){
-          // Card already centered — clicking anywhere on it triggers its action:
-          // a real click on the card's <a> (opens the URL) or <button> (e.g. opens AI chat).
           var action = card.querySelector('.cf-link');
           if(action){
             suppressDelegatedClick = true;
@@ -500,7 +490,6 @@ document.addEventListener("DOMContentLoaded", function () {
             suppressDelegatedClick = false;
           }
         } else {
-          // Side card — just bring it to the center.
           goTo(idx);
         }
       });
@@ -541,10 +530,10 @@ document.addEventListener("DOMContentLoaded", function () {
           var dimExtra = hovering ? 0.15 : 0;
           var gap = CW * 0.38 + step * 14;
           var tx  = W/2 - CW/2 + side * gap;
-          var ry  = side * Math.min(44 + step * 7, 68);
-          var sc2 = Math.max(0.52, 0.74 - step * 0.07);
-          var op  = Math.max(0,    0.55 - step * 0.13 - dimExtra);
-          var br2 = Math.max(0.20, 0.56 - step * 0.10 - dimExtra);
+          var ry  = side * Math.min(36 + step * 8, 68);
+          var sc2 = Math.max(0.5, 0.78 - step * 0.08);
+          var op  = Math.max(0,    0.68 - step * 0.14 - dimExtra);
+          var br2 = Math.max(0.22, 0.66 - step * 0.11 - dimExtra);
           var sideY = step * 8;
           c.style.transform = 'translateX('+tx+'px) translateY(calc(-50% + '+sideY+'px)) rotateY('+ry+'deg) scale('+sc2+')';
           c.style.opacity   = op;
@@ -570,7 +559,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 })();
 
-/* ── About section: interactive typing terminal ── */
+/* -- About section: interactive typing terminal -- */
 (function aboutTerminal(){
   var wrap = document.getElementById('abTerminal');
   var body = document.getElementById('abTermBody');
@@ -613,7 +602,6 @@ document.addEventListener("DOMContentLoaded", function () {
   function typeSequence(){
     body.innerHTML = '';
     var li = 0;
-
     function nextLine(){
       if(li >= script.length){
         var cur = document.createElement('span');
@@ -625,7 +613,6 @@ document.addEventListener("DOMContentLoaded", function () {
       var div = document.createElement('div');
       div.className = 'ab-term-line' + (line.type === 'out' ? ' ab-term-out' : '');
       body.appendChild(div);
-
       if(line.type === 'cmd'){
         var prompt = document.createElement('span');
         prompt.className = 'ab-term-prompt';
@@ -643,10 +630,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(reduceMotion){
-    renderStatic();
-    return;
-  }
+  if(reduceMotion){ renderStatic(); return; }
 
   if('IntersectionObserver' in window){
     var io = new IntersectionObserver(function(entries){
@@ -661,4 +645,39 @@ document.addEventListener("DOMContentLoaded", function () {
   } else {
     typeSequence();
   }
+})();
+
+/* -- Generic scroll-reveal for .reveal elements (bio paragraphs, timeline items) -- */
+(function scrollReveal(){
+  var items = Array.from(document.querySelectorAll('.reveal'));
+  if(!items.length) return;
+
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduceMotion || !('IntersectionObserver' in window)){
+    items.forEach(function(el){ el.classList.add('is-visible'); });
+    return;
+  }
+
+  // Stagger items that share the same parent container (e.g. timeline items)
+  var groups = new Map();
+  items.forEach(function(el){
+    var key = el.parentElement;
+    var list = groups.get(key) || [];
+    list.push(el);
+    groups.set(key, list);
+  });
+  groups.forEach(function(list){
+    list.forEach(function(el, idx){ el.style.transitionDelay = (idx * 90) + 'ms'; });
+  });
+
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('is-visible');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: .15, rootMargin: '0px 0px -40px 0px' });
+
+  items.forEach(function(el){ io.observe(el); });
 })();
