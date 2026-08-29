@@ -114,12 +114,21 @@
           <span class=ab-status-dot></span>
           <span>Open to work</span>
         </div>
-        <!-- floating code snippet -->
-        <div class=ab-code-float>
-          <span class=ab-code-kw>const</span> dev <span class=ab-code-op>=</span> {<br>
-          &nbsp;&nbsp;location: <span class=ab-code-str>"Nepal 🇳🇵"</span>,<br>
-          &nbsp;&nbsp;coffee: <span class=ab-code-str>"always"</span><br>
-          }
+        <!-- interactive terminal -->
+        <div class="ab-terminal" id="abTerminal">
+          <div class="ab-term-bar">
+            <span class="ab-term-dot ab-term-dot--r"></span>
+            <span class="ab-term-dot ab-term-dot--y"></span>
+            <span class="ab-term-dot ab-term-dot--g"></span>
+            <span class="ab-term-title">sudarshan@dev:~</span>
+          </div>
+          <div class="ab-term-body" id="abTermBody">
+            <div class="ab-term-line"><span class="ab-term-prompt">$</span><span class="ab-term-cmd">whoami</span></div>
+            <div class="ab-term-line ab-term-out">sudarshan — self-taught dev, Kathmandu 🇳🇵</div>
+            <div class="ab-term-line"><span class="ab-term-prompt">$</span><span class="ab-term-cmd">./ship.sh --latest</span></div>
+            <div class="ab-term-line ab-term-out">building… done ✓</div>
+            <span class="ab-term-cursor"></span>
+          </div>
         </div>
       </div>
 
@@ -136,9 +145,9 @@
 
       <!-- headline -->
       <h2 class=ab-headline>
-        I turn ideas into<br>
-        <em class=ab-headline-em>real things</em><br>
-        <span class=ab-headline-ghost>on the internet.</span>
+        Ideas are cheap.<br>
+        <em class=ab-headline-em>I build the ones</em><br>
+        <span class=ab-headline-ghost>that ship.</span>
       </h2>
 
       <!-- bio paragraphs -->
@@ -150,7 +159,7 @@
       <!-- timeline -->
       <div class=ab-timeline>
         <div class=ab-timeline-head>Journey</div>
-        <div class=ab-tl style="max-height:260px;overflow-y:auto;padding-right:8px;scrollbar-width:thin;scrollbar-color:rgba(99,102,241,0.4) transparent;">
+        <div class=ab-tl>
           <div class=ab-tl-item>
             <div class=ab-tl-dot></div>
             <div class=ab-tl-body>
@@ -239,7 +248,7 @@
                   <div class=cf-title>Lost &amp; Found Nepal</div>
                   <div class=cf-desc>Community platform to report and recover lost items across Nepal. Fast, mobile-first, built for real people.</div>
                   <div class=cf-stack><span class=cf-pill>React</span><span class=cf-pill>TypeScript</span><span class=cf-pill>Tailwind</span><span class=cf-pill>Node.js</span></div>
-                  <a class=cf-link href=https://lostfoundnepal.vercel.app/ target=_blank rel="noopener noreferrer">View project <svg fill=none height=12 width=12 viewBox="0 0 24 24" stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2.5 aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1=10 y1=14 x2=21 y2=3 /></svg></a>
+                  <a class=cf-link href=https://lostandfoundnepal.vercel.app/ target=_blank rel="noopener noreferrer">View project <svg fill=none height=12 width=12 viewBox="0 0 24 24" stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2.5 aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1=10 y1=14 x2=21 y2=3 /></svg></a>
                 </div>
                 <div class=cf-card-right><div class=cf-mock>
                   <div style="background:rgba(0,0,0,.28);border-radius:9px;padding:7px 10px;font-size:10px;color:rgba(255,255,255,.35)">Search lost wallet, phone, ID...</div>
