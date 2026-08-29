@@ -63,6 +63,17 @@
   /* ===== Animations ===== */
   @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+  /* Scroll-reveal (bio paragraphs, timeline items) */
+  .reveal{
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity .6s cubic-bezier(.4,0,.2,1), transform .6s cubic-bezier(.4,0,.2,1);
+  }
+  .reveal.is-visible{ opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce){
+    .reveal{ opacity: 1; transform: none; transition: none; }
+  }
   @keyframes fade-in-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
   @keyframes pulse-glow{0%,100%{box-shadow:0 0 20px oklch(0.7 0.22 295 / .3)}50%{box-shadow:0 0 40px oklch(0.7 0.22 295 / .6)}}
@@ -182,6 +193,9 @@
   }
   .edu-block{margin-top:2rem;transform:translateZ(40px);}
   .edu-title{display:flex;align-items:center;gap:.5rem;font-size:.875rem;font-weight:600;}
+  .tags-block{margin-top:1.5rem;transform:translateZ(25px);}
+  .tags-block .edu-title{margin-bottom:.6rem;}
+  .tags-block .tags{margin-top:0;}
   .chips{margin-top:.75rem;display:flex;flex-wrap:wrap;gap:.5rem;}
   .chip{
     display:inline-flex;align-items:center;gap:.5rem;
@@ -561,8 +575,8 @@
 
   /* Interactive terminal */
   .ab-terminal {
-    position: absolute; bottom: -1.75rem; right: -1rem; z-index: 3;
-    width: 15.5rem;
+    position: absolute; bottom: -4.25rem; right: -1rem; z-index: 3;
+    width: 14rem;
     background: oklch(0.10 0.02 260 / .94); backdrop-filter: blur(14px);
     border: 1px solid oklch(1 0 0 / .1);
     border-radius: .85rem;
