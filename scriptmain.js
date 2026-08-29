@@ -569,3 +569,96 @@ document.addEventListener("DOMContentLoaded", function () {
     init();
   }
 })();
+
+/* ── About section: interactive typing terminal ── */
+(function aboutTerminal(){
+  var wrap = document.getElementById('abTerminal');
+  var body = document.getElementById('abTermBody');
+  if(!wrap || !body) return;
+
+  var script = [
+    { type: 'cmd', text: 'whoami' },
+    { type: 'out', text: 'sudarshan — self-taught dev, Kathmandu 🇳🇵' },
+    { type: 'cmd', text: 'cat status.txt' },
+    { type: 'out', text: '[ok] open to work' },
+    { type: 'out', text: '[ok] fueled by coffee' },
+    { type: 'cmd', text: './ship.sh --latest' },
+    { type: 'out', text: 'building… done ✓' }
+  ];
+
+  function renderStatic(){
+    var html = script.map(function(l){
+      if(l.type === 'cmd'){
+        return '<div class="ab-term-line"><span class="ab-term-prompt">$</span><span class="ab-term-cmd">' + l.text + '</span></div>';
+      }
+      return '<div class="ab-term-line ab-term-out">' + l.text + '</div>';
+    }).join('');
+    body.innerHTML = html + '<span class="ab-term-cursor"></span>';
+  }
+
+  function typeChars(el, text, done){
+    var chars = Array.from(text);
+    var i = 0;
+    (function tick(){
+      if(i <= chars.length){
+        el.textContent = chars.slice(0, i).join('');
+        i++;
+        setTimeout(tick, 26 + Math.random() * 22);
+      } else {
+        done();
+      }
+    })();
+  }
+
+  function typeSequence(){
+    body.innerHTML = '';
+    var li = 0;
+
+    function nextLine(){
+      if(li >= script.length){
+        var cur = document.createElement('span');
+        cur.className = 'ab-term-cursor';
+        body.appendChild(cur);
+        return;
+      }
+      var line = script[li++];
+      var div = document.createElement('div');
+      div.className = 'ab-term-line' + (line.type === 'out' ? ' ab-term-out' : '');
+      body.appendChild(div);
+
+      if(line.type === 'cmd'){
+        var prompt = document.createElement('span');
+        prompt.className = 'ab-term-prompt';
+        prompt.textContent = '$';
+        var cmdSpan = document.createElement('span');
+        cmdSpan.className = 'ab-term-cmd';
+        div.appendChild(prompt);
+        div.appendChild(cmdSpan);
+        typeChars(cmdSpan, line.text, function(){ setTimeout(nextLine, 260); });
+      } else {
+        typeChars(div, line.text, function(){ setTimeout(nextLine, 160); });
+      }
+    }
+    nextLine();
+  }
+
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduceMotion){
+    renderStatic();
+    return;
+  }
+
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          typeSequence();
+          io.unobserve(wrap);
+        }
+      });
+    }, { threshold: .4 });
+    io.observe(wrap);
+  } else {
+    typeSequence();
+  }
+})();
