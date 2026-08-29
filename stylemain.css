@@ -559,22 +559,45 @@
     box-shadow: 0 0 6px #22c55e88; flex-shrink: 0;
   }
 
-  /* Floating code snippet */
-  .ab-code-float {
-    position: absolute; bottom: -1.5rem; right: -1rem; z-index: 3;
-    background: oklch(0.11 0.03 270 / .92); backdrop-filter: blur(12px);
+  /* Interactive terminal */
+  .ab-terminal {
+    position: absolute; bottom: -1.75rem; right: -1rem; z-index: 3;
+    width: 15.5rem;
+    background: oklch(0.10 0.02 260 / .94); backdrop-filter: blur(14px);
     border: 1px solid oklch(1 0 0 / .1);
-    border-radius: 1rem; padding: .875rem 1.1rem;
-    font-family: ui-monospace, Menlo, monospace; font-size: .72rem; line-height: 1.7;
-    color: oklch(0.75 0.05 250);
-    box-shadow: 0 12px 40px rgba(0,0,0,.4);
+    border-radius: .85rem;
+    box-shadow: 0 16px 46px rgba(0,0,0,.45), 0 0 0 1px oklch(0.78 0.18 200 / .06);
+    overflow: hidden;
     display: none;
-    white-space: nowrap;
   }
-  @media(min-width:640px) { .ab-code-float { display: block; } }
-  .ab-code-kw  { color: oklch(0.75 0.2 295); }
-  .ab-code-op  { color: oklch(0.75 0.18 200); }
-  .ab-code-str { color: oklch(0.78 0.16 150); }
+  @media(min-width:640px) { .ab-terminal { display: block; } }
+  .ab-term-bar {
+    display: flex; align-items: center; gap: .4rem;
+    padding: .55rem .75rem;
+    background: oklch(1 0 0 / .04);
+    border-bottom: 1px solid oklch(1 0 0 / .08);
+  }
+  .ab-term-dot { width: .5rem; height: .5rem; border-radius: 9999px; display: inline-block; }
+  .ab-term-dot--r { background: #ff5f57; }
+  .ab-term-dot--y { background: #febc2e; }
+  .ab-term-dot--g { background: #28c840; }
+  .ab-term-title {
+    margin-left: .35rem; font-family: ui-monospace, Menlo, monospace; font-size: .62rem;
+    color: oklch(0.6 0.02 260); letter-spacing: .02em;
+  }
+  .ab-term-body {
+    padding: .75rem .85rem .9rem;
+    font-family: ui-monospace, Menlo, monospace; font-size: .68rem; line-height: 1.65;
+    min-height: 6.5rem;
+  }
+  .ab-term-line { white-space: pre-wrap; word-break: break-word; }
+  .ab-term-prompt { color: var(--accent); margin-right: .35rem; }
+  .ab-term-cmd { color: var(--foreground); }
+  .ab-term-out { color: oklch(0.78 0.16 150); display: block; }
+  .ab-term-cursor {
+    display: inline-block; width: .5em; height: 1em; vertical-align: -.15em;
+    background: var(--accent); animation: blink 1s step-end infinite; margin-left: 1px;
+  }
 
   /* ── RIGHT: text column ── */
   .ab-right { display: flex; flex-direction: column; gap: 2.75rem; }
