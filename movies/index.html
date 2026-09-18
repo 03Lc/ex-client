@@ -1602,10 +1602,14 @@ const MILESTONES = [
     test: m => /a perfect world/i.test(m.title || "") && parseInt(m.year) === 1993,
     eyebrow: "🎬 The one that started it all",
     note: `The very first movie I ever watched — and I loved it. Everything on this list, in some way, traces back to this one.`,
+    pinned: true, // always floats to the top, regardless of sort mode
   },
 ];
 function getMilestone(m) {
   return MILESTONES.find(ms => ms.test(m)) || null;
+}
+function isPinnedMovie(m) {
+  return !!getMilestone(m)?.pinned;
 }
 
 // ── Supabase helpers ──
@@ -1833,6 +1837,12 @@ function renderGrid() {
     }
   });
 
+  // Pinned milestones (e.g. the first movie ever watched) always float to the very top,
+  // no matter what sort mode is active — they keep the sorted order for everything else.
+  const pinned = [], rest = [];
+  list.forEach(m => (getMilestone(m)?.pinned ? pinned : rest).push(m));
+  list = [...pinned, ...rest];
+
   const newCountText = `${movies.length} title${movies.length !== 1 ? "s" : ""} and counting`;
   if (countEl.textContent !== newCountText) {
     countEl.style.transition = "opacity .2s";
@@ -1908,17 +1918,18 @@ function renderGrid() {
         </div>`;
     }).join("");
 
-    // Decade dividers for list view
+    // Decade dividers for list view — pinned milestones sit outside decade grouping
     if ((sortMode === "year-desc" || sortMode === "year-asc") && !filterQuery && !favOnly) {
       const rows = [...grid.querySelectorAll(".list-row")];
       let lastDecade = null;
       rows.forEach((row, i) => {
+        if (isPinnedMovie(list[i])) return; // pinned row — no divider, doesn't affect grouping
         const yr = parseInt(list[i]?.year) || 0;
         if (!yr) return;
         const decade = Math.floor(yr / 10) * 10;
         if (decade !== lastDecade) {
           lastDecade = decade;
-          const count = list.filter(m => m.year && Math.floor(m.year/10)*10 === decade).length;
+          const count = list.filter(m => !isPinnedMovie(m) && m.year && Math.floor(m.year/10)*10 === decade).length;
           const label = decade === 2020 ? "2020s" : decade === 2010 ? "2010s" : decade === 2000 ? "2000s" : decade === 1990 ? "90s" : decade === 1980 ? "80s" : `${decade}s`;
           const div = document.createElement("div");
           div.className = "list-decade";
@@ -2085,17 +2096,18 @@ function renderGrid() {
       </div>`;
   }).join("");
 
-  // Inject decade dividers when sorted by year
+  // Inject decade dividers when sorted by year — pinned milestones sit outside decade grouping
   if ((sortMode === "year-desc" || sortMode === "year-asc") && !filterQuery && !favOnly) {
     const cards = [...grid.querySelectorAll(".movie-card")];
     let lastDecade = null;
     cards.forEach((card, i) => {
+      if (isPinnedMovie(list[i])) return; // pinned card — no divider, doesn't affect grouping
       const yr = parseInt(list[i]?.year) || 0;
       if (!yr) return;
       const decade = Math.floor(yr / 10) * 10;
       if (decade !== lastDecade) {
         lastDecade = decade;
-        const count = list.filter(m => m.year && Math.floor(m.year/10)*10 === decade).length;
+        const count = list.filter(m => !isPinnedMovie(m) && m.year && Math.floor(m.year/10)*10 === decade).length;
         const label = decade === 2020 ? "2020s" : decade === 2010 ? "2010s" : decade === 2000 ? "2000s" : decade === 1990 ? "90s" : decade === 1980 ? "80s" : `${decade}s`;
         const div = document.createElement("div");
         div.className = "decade-divider";
