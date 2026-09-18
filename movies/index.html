@@ -326,31 +326,6 @@ body.admin-mode .card-foot {
 body.admin-mode .card-title { cursor:text; }
 .card-year { font-size:.7rem; color:var(--muted); font-weight:500; }
 
-/* ── Surprise me ── */
-#surprise-btn {
-  display:inline-flex; align-items:center; gap:.4rem;
-  background:oklch(0.13 0.025 268); border:1px solid oklch(1 0 0 / 8%);
-  border-radius:.75rem; padding:0 .85rem; height:2.45rem;
-  font-size:.78rem; font-weight:700; color:oklch(0.7 0.05 270);
-  cursor:pointer; transition:all .18s; flex-shrink:0; white-space:nowrap;
-}
-#surprise-btn:hover { color:var(--fg); border-color:oklch(0.76 0.17 195 / .3); background:oklch(0.15 0.03 268); }
-#surprise-btn:active { transform:scale(.96); }
-#surprise-btn .dice { display:inline-block; transition:transform .4s cubic-bezier(.34,1.4,.64,1); }
-#surprise-btn.rolling .dice { transform:rotate(360deg) scale(1.15); }
-
-/* Highlight pulse — the picked card/row glows briefly, then fades */
-@keyframes surprise-ring {
-  0%   { box-shadow:0 0 0 0 oklch(0.76 0.17 195 / .55), 0 0 0 0 oklch(0.76 0.17 195 / 0); }
-  60%  { box-shadow:0 0 0 6px oklch(0.76 0.17 195 / .22), 0 0 40px 6px oklch(0.76 0.17 195 / .35); }
-  100% { box-shadow:0 0 0 10px oklch(0.76 0.17 195 / 0), 0 0 40px 6px oklch(0.76 0.17 195 / 0); }
-}
-.movie-card.surprise-hit .poster-wrap,
-.list-row.surprise-hit {
-  animation: surprise-ring 1.6s ease-out 2;
-  border-radius:inherit;
-}
-
 /* ── View toggle ── */
 .view-toggle {
   display:inline-flex; align-items:center;
@@ -1438,11 +1413,6 @@ body.admin-mode .list-watch-btn { display:flex; }
     <!-- Count -->
     <span class="filter-count" id="filter-count"></span>
 
-    <!-- Surprise me -->
-    <button id="surprise-btn" title="Pick something at random">
-      <span class="dice">🎲</span> Surprise me
-    </button>
-
     <!-- View toggle -->
     <div class="view-toggle" title="Switch view">
       <button class="view-btn active" id="view-grid" aria-label="Grid view" title="Grid view">
@@ -1857,7 +1827,6 @@ function renderGrid() {
   }
 
   updateStats();
-  lastRenderedList = list;
 
   if (list.length === 0) {
     grid.className = viewMode === "list" ? "movie-list" : "movie-grid";
@@ -2289,25 +2258,6 @@ let sortMode = "year-desc";
 let favOnly = false;
 let typeFilter = "all"; // "all" | "movie" | "tv"
 let viewMode = "grid";  // "grid" | "list"
-let lastRenderedList = []; // whatever's currently visible after filter/sort — Surprise Me picks from this
-
-// ── Surprise me — picks a random title from whatever's currently visible ──
-document.getElementById("surprise-btn")?.addEventListener("click", function() {
-  if (!lastRenderedList.length) { showToast("🎲", "Nothing to pick from"); return; }
-
-  this.classList.add("rolling");
-  setTimeout(() => this.classList.remove("rolling"), 400);
-
-  const pick = lastRenderedList[Math.floor(Math.random() * lastRenderedList.length)];
-  const el = document.querySelector(`#movie-grid [data-id="${pick.id}"]`);
-  if (!el) { showToast("🎲", "Couldn't find it — try again"); return; }
-
-  el.scrollIntoView({ behavior: "smooth", block: "center" });
-  el.classList.add("surprise-hit");
-  setTimeout(() => el.classList.remove("surprise-hit"), 3300);
-
-  showToast("🎲", `How about "${pick.title.slice(0, 30)}"?`);
-});
 
 document.getElementById("view-grid")?.addEventListener("click", () => {
   viewMode = "grid";
