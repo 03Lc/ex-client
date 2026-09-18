@@ -12,7 +12,7 @@
   img-src 'self' https://image.tmdb.org data: blob:;
   connect-src https://api.themoviedb.org https://*.supabase.co;
   frame-ancestors 'none';
-"> 
+">
 <title>Watched · Sudarshan</title>
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -1555,11 +1555,27 @@ function esc(str) {
 
 let movies = [];        // loaded from Supabase
 
-// ── Tribute — quietly marks a specific title, no DB column, no admin toggle ──
-const TRIBUTE_TITLE_RE = /14\s*peaks/i;
-const TRIBUTE_NOTE = "In memory of Nirmal \u2018Nims Dai\u2019 Purja (1983\u20132026)";
-function isTribute(m) {
-  return TRIBUTE_TITLE_RE.test(m.title || "");
+// ── Personal milestones — quietly marks specific titles, no DB column, no admin toggle ──
+// Each entry needs a title match + year (so a future remake with the same name doesn't get flagged by mistake).
+const MILESTONES = [
+  {
+    test: m => /14\s*peaks/i.test(m.title || ""),
+    eyebrow: "🕯️ In loving memory",
+    name: `Nirmal "Nims Dai" Purja MBE`,
+    dates: "25 July 1983 — 31 July 2026 · Broad Peak, Pakistan",
+    note: `A Gurkha soldier turned mountaineer who climbed all fourteen of the world's 8,000m peaks — first in a record
+      <strong>six months and six days</strong>, then again without supplemental oxygen. He carried Nepal's name to
+      the summit of every one of them, and inspired a generation back home to dream past the mountains around them.`,
+    tag: "🇳🇵 Rest easy, Nims Dai. The mountains remember you.",
+  },
+  {
+    test: m => /a perfect world/i.test(m.title || "") && parseInt(m.year) === 1993,
+    eyebrow: "🎬 The one that started it all",
+    note: `The very first movie I ever watched — and I loved it. Everything on this list, in some way, traces back to this one.`,
+  },
+];
+function getMilestone(m) {
+  return MILESTONES.find(ms => ms.test(m)) || null;
 }
 
 // ── Supabase helpers ──
@@ -1836,7 +1852,10 @@ function renderGrid() {
             return `<div class="list-poster-ph" style="background:linear-gradient(135deg,oklch(0.2 0.08 ${h}),oklch(0.13 0.06 ${h2}))">${safeTitle.charAt(0)}</div>`;
           })();
 
-      const listTributeMark = isTribute(m) ? `<span class="list-tribute-mark" tabindex="0" data-tribute="${esc(TRIBUTE_NOTE)}" aria-label="${esc(TRIBUTE_NOTE)}">⛰</span>` : "";
+      const milestone = getMilestone(m);
+      const listTributeMark = milestone
+        ? `<span class="list-tribute-mark" tabindex="0" data-tribute="${esc(milestone.eyebrow.replace(/^\S+\s/, "") + ": " + milestone.note.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim())}" aria-label="milestone">⛰</span>`
+        : "";
 
       return `
         <div class="list-row ${favClass}" style="${isFirstLoad ? `animation-delay:${Math.min(i*30,350)}ms` : `animation:none`}">
@@ -2001,8 +2020,9 @@ function renderGrid() {
           ${tvBadge}
           ${watchingBadge}`;
 
-    // The tribute title gets its words placed beside its own poster, right in the grid — not a separate section.
-    if (isTribute(m)) {
+    // A milestone title gets its words placed beside its own poster, right in the grid — not a separate section.
+    const milestone = getMilestone(m);
+    if (milestone) {
       return `
       <div class="movie-card ${favClass} tribute-card reveal-pending" style="${isFirstLoad ? `animation-delay:${Math.min(i*40,400)}ms` : `animation:none`}; position:relative;">
         <div class="tribute-poster-col">
@@ -2014,15 +2034,11 @@ function renderGrid() {
           </div>
         </div>
         <div class="tribute-copy">
-          <div class="memoriam-eyebrow">🕯️ In loving memory</div>
-          <div class="memoriam-name">Nirmal "Nims Dai" Purja MBE</div>
-          <div class="memoriam-dates">25 July 1983 — 31 July 2026 · Broad Peak, Pakistan</div>
-          <p class="memoriam-note">
-            A Gurkha soldier turned mountaineer who climbed all fourteen of the world's 8,000m peaks — first in a record
-            <strong>six months and six days</strong>, then again without supplemental oxygen. He carried Nepal's name to
-            the summit of every one of them, and inspired a generation back home to dream past the mountains around them.
-          </p>
-          <span class="memoriam-tag">🇳🇵 Rest easy, Nims Dai. The mountains remember you.</span>
+          <div class="memoriam-eyebrow">${milestone.eyebrow}</div>
+          ${milestone.name ? `<div class="memoriam-name">${milestone.name}</div>` : ""}
+          ${milestone.dates ? `<div class="memoriam-dates">${milestone.dates}</div>` : ""}
+          <p class="memoriam-note">${milestone.note}</p>
+          ${milestone.tag ? `<span class="memoriam-tag">${milestone.tag}</span>` : ""}
         </div>
       </div>`;
     }
