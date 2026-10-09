@@ -576,7 +576,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var script = [
     { type: 'cmd', text: 'whoami' },
-    { type: 'out', text: 'sudarshan — self-taught dev, Kathmandu 🇳🇵' },
+    { type: 'out', text: 'sudarshan — self-taught dev, Pokhara 🇳🇵' },
     { type: 'cmd', text: 'cat status.txt' },
     { type: 'out', text: '[ok] open to work' },
     { type: 'out', text: '[ok] fueled by coffee' },
