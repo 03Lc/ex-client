@@ -1954,3 +1954,462 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .cf-card.cf-active{ cursor: pointer; }
 .cf-card:not(.cf-active){ cursor: grab; }
 .cf-card:not(.cf-active):active{ cursor: grabbing; }
+
+
+/* ===== Professional portrait presentation ===== */
+.portrait-wrap{
+  position: relative;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 28rem;
+  aspect-ratio: 1;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform .12s linear;
+}
+.portrait-orbit{
+  position: absolute;
+  inset: -12px;
+  border-radius: 2.35rem;
+  border: 1px dashed color-mix(in oklab, var(--accent) 35%, transparent);
+  opacity: .55;
+  pointer-events: none;
+  animation: portrait-orbit-spin 28s linear infinite;
+  transform: translateZ(-20px);
+}
+@keyframes portrait-orbit-spin{
+  from{ transform: translateZ(-20px) rotate(0deg); }
+  to{ transform: translateZ(-20px) rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce){
+  .portrait-orbit{ animation: none; }
+}
+.portrait-frame{
+  position: absolute;
+  inset: 0;
+  border-radius: 2rem;
+  background-image: var(--gradient-primary);
+  padding: 2px;
+  box-shadow:
+    var(--shadow-elegant),
+    0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent),
+    0 25px 50px -20px oklch(0.7 0.22 295 / 0.45);
+}
+.portrait-frame::after{
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: calc(2rem - 2px);
+  background: var(--background);
+}
+.portrait-img{
+  position: absolute;
+  inset: .7rem;
+  border-radius: 1.45rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+  transform: translateZ(40px);
+  background: var(--card);
+}
+.portrait-img img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+  transition: transform .55s cubic-bezier(.22,1,.36,1);
+}
+.portrait-wrap:hover .portrait-img img{
+  transform: scale(1.04);
+}
+.portrait-shine{
+  position: absolute;
+  inset: 0;
+  opacity: .55;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 40%), rgba(255,255,255,.4), transparent 42%);
+}
+.portrait-gradient{
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    color-mix(in oklab, var(--background) 88%, transparent) 0%,
+    color-mix(in oklab, var(--background) 35%, transparent) 35%,
+    transparent 58%
+  );
+}
+/* Name plate over image bottom */
+.portrait-nameplate{
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 2;
+  padding: 2.75rem 1.1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+  pointer-events: none;
+  transform: translateZ(45px);
+}
+.portrait-name{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -.02em;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0,0,0,.55);
+}
+.portrait-role{
+  font-size: .72rem;
+  font-weight: 500;
+  color: color-mix(in oklab, #fff 75%, transparent);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+/* Floaters refined */
+.floater{
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  border: 1px solid color-mix(in oklab, var(--border) 90%, transparent);
+  border-radius: 1rem;
+  padding: .7rem .95rem;
+  background: color-mix(in oklab, var(--card) 72%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    0 10px 30px -12px rgba(0,0,0,.55),
+    0 0 0 1px color-mix(in oklab, var(--foreground) 4%, transparent);
+  animation: float 4.5s ease-in-out infinite;
+  transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+.floater:hover{
+  border-color: color-mix(in oklab, var(--accent) 45%, transparent);
+  box-shadow: 0 12px 36px -10px oklch(0.7 0.22 295 / 0.35);
+}
+.floater-tl{ top: 1.35rem; left: .65rem; transform: translateZ(70px); animation-delay: .15s; }
+.floater-br{ right: .65rem; bottom: 1.35rem; transform: translateZ(80px); animation-delay: 1s; }
+.floater-tr{ top: 1.35rem; right: .65rem; transform: translateZ(75px); animation-delay: .55s; }
+.floater-icon{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.15rem;
+  width: 2.15rem;
+  border-radius: .65rem;
+  background-image: var(--gradient-primary);
+  color: var(--primary-foreground);
+  flex-shrink: 0;
+}
+.floater-icon--accent{
+  background-image: none;
+  background: color-mix(in oklab, var(--accent) 22%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in oklab, var(--accent) 35%, transparent);
+}
+.floater-title{ font-size: .75rem; font-weight: 650; line-height: 1.15; }
+.floater-sub{ font-size: 10px; color: var(--muted-foreground); margin-top: 2px; }
+.floater-online{
+  position: absolute;
+  left: .85rem;
+  bottom: .85rem;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  border: 1px solid color-mix(in oklab, #22c55e 45%, transparent);
+  background: color-mix(in oklab, #14532d 55%, transparent);
+  color: #86efac;
+  padding: .3rem .8rem;
+  border-radius: 9999px;
+  font-size: .72rem;
+  font-weight: 600;
+  backdrop-filter: blur(12px);
+  transform: translateZ(60px);
+  box-shadow: 0 4px 16px rgba(34,197,94,.15);
+}
+.floater-online .dot{
+  display: inline-block;
+  height: .4rem;
+  width: .4rem;
+  background: #22c55e;
+  border-radius: 9999px;
+  box-shadow: 0 0 8px #22c55e;
+  animation: pulse 2s ease-in-out infinite;
+  vertical-align: middle;
+}
+.portrait-glow{
+  position: absolute;
+  inset: -1.75rem;
+  z-index: -1;
+  border-radius: 3rem;
+  opacity: .38;
+  filter: blur(55px);
+  background-image: var(--gradient-primary);
+  transform: translateZ(-80px);
+  transition: opacity .4s ease;
+}
+.portrait-wrap:hover .portrait-glow{ opacity: .55; }
+
+@media(max-width:380px){
+  .floater{ padding: .5rem .65rem; gap: .4rem; }
+  .floater-icon{ height: 1.75rem; width: 1.75rem; }
+  .floater-title{ font-size: .68rem; }
+  .floater-sub{ font-size: 9px; }
+  .floater-tl{ top: .85rem; left: .4rem; }
+  .floater-br{ right: .4rem; bottom: .85rem; }
+  .floater-tr{ top: .85rem; right: .4rem; }
+  .portrait-name{ font-size: 1rem; }
+  .portrait-nameplate{ padding: 2.2rem .85rem .85rem; }
+}
+@media(max-width:640px){
+  /* hide location floater on very small screens to avoid clutter */
+  .floater-tr{ display: none; }
+}
+
+
+/* ========== STYLE A — Agency Card portrait (integrated) ========== */
+.portrait-wrap{
+  position: relative;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 28rem;
+  aspect-ratio: 1;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform .12s linear;
+}
+/* soft orbit ring like mockup */
+.portrait-orbit{
+  position: absolute;
+  inset: -14px;
+  border-radius: 2.5rem;
+  border: 1.5px dashed color-mix(in oklab, var(--primary) 40%, transparent);
+  opacity: .5;
+  pointer-events: none;
+  animation: portrait-orbit-spin 32s linear infinite;
+  transform: translateZ(-24px);
+  box-shadow: 0 0 40px color-mix(in oklab, var(--primary) 12%, transparent);
+}
+@keyframes portrait-orbit-spin{
+  from { transform: translateZ(-24px) rotate(0deg); }
+  to   { transform: translateZ(-24px) rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce){
+  .portrait-orbit{ animation: none; opacity: .35; }
+}
+.portrait-frame{
+  position: absolute;
+  inset: 0;
+  border-radius: 1.75rem;
+  background: linear-gradient(135deg, oklch(0.85 0.16 200), oklch(0.72 0.2 290), oklch(0.78 0.18 260));
+  padding: 2.5px;
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--primary) 25%, transparent),
+    0 20px 50px -15px oklch(0.7 0.22 295 / 0.5),
+    0 0 60px oklch(0.7 0.22 295 / 0.2);
+}
+.portrait-frame::after{
+  content: "";
+  position: absolute;
+  inset: 2.5px;
+  border-radius: calc(1.75rem - 2.5px);
+  background: var(--background);
+}
+.portrait-img{
+  position: absolute;
+  inset: 0.65rem;
+  border-radius: 1.35rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent);
+  transform: translateZ(40px);
+  background: #0a0a12;
+}
+.portrait-img img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 15%;
+  transition: transform .6s cubic-bezier(.22,1,.36,1);
+}
+.portrait-wrap:hover .portrait-img img{
+  transform: scale(1.045);
+}
+.portrait-shine{
+  position: absolute;
+  inset: 0;
+  opacity: .5;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--mx, 45%) var(--my, 35%), rgba(255,255,255,.38), transparent 45%);
+}
+.portrait-gradient{
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(8,8,18,.92) 0%,
+    rgba(8,8,18,.55) 32%,
+    transparent 58%
+  );
+}
+.portrait-nameplate{
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 2;
+  padding: 2.5rem 1.15rem 1.05rem;
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  pointer-events: none;
+  transform: translateZ(48px);
+}
+.portrait-name{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: -.02em;
+  color: #fff;
+  text-shadow: 0 2px 14px rgba(0,0,0,.6);
+}
+.portrait-role{
+  font-size: .7rem;
+  font-weight: 500;
+  color: rgba(255,255,255,.72);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+/* Glass floaters — Style A */
+.floater{
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+  padding: .65rem .9rem;
+  background: rgba(18, 16, 32, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 12px 32px -10px rgba(0,0,0,.55);
+  animation: float 4.5s ease-in-out infinite;
+  transition: border-color .25s, transform .25s, box-shadow .25s;
+  z-index: 5;
+}
+.floater:hover{
+  border-color: color-mix(in oklab, var(--accent) 50%, transparent);
+  box-shadow: 0 14px 40px -8px oklch(0.7 0.22 295 / 0.35);
+}
+.floater-tl{
+  top: 1.1rem; left: .55rem;
+  transform: translateZ(72px);
+  animation-delay: .1s;
+}
+.floater-tr{
+  top: 1.1rem; right: .55rem;
+  transform: translateZ(74px);
+  animation-delay: .45s;
+}
+.floater-br{
+  right: .55rem; bottom: 1.1rem;
+  transform: translateZ(78px);
+  animation-delay: .9s;
+}
+.floater-icon{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.1rem;
+  width: 2.1rem;
+  border-radius: 10px;
+  background-image: var(--gradient-primary);
+  color: var(--primary-foreground);
+  flex-shrink: 0;
+}
+.floater-icon--accent{
+  background-image: none;
+  background: color-mix(in oklab, var(--accent) 20%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in oklab, var(--accent) 40%, transparent);
+}
+.floater-title{ font-size: .75rem; font-weight: 650; line-height: 1.2; color: #fff; }
+.floater-sub{ font-size: 10px; color: var(--muted-foreground); margin-top: 1px; }
+/* Available pill */
+.floater-online{
+  position: absolute;
+  left: .75rem;
+  bottom: .75rem;
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  border: 1px solid rgba(34,197,94,.45);
+  background: rgba(20, 83, 45, 0.65);
+  color: #86efac;
+  padding: .32rem .85rem;
+  border-radius: 9999px;
+  font-size: .72rem;
+  font-weight: 650;
+  backdrop-filter: blur(12px);
+  transform: translateZ(65px);
+  box-shadow: 0 4px 18px rgba(34,197,94,.2);
+}
+.floater-online .dot{
+  width: .4rem; height: .4rem;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  animation: pulse 2s ease-in-out infinite;
+}
+.portrait-glow{
+  position: absolute;
+  inset: -2rem;
+  z-index: -1;
+  border-radius: 3rem;
+  opacity: .42;
+  filter: blur(50px);
+  background-image: var(--gradient-primary);
+  transform: translateZ(-80px);
+  transition: opacity .4s;
+}
+.portrait-wrap:hover .portrait-glow{ opacity: .58; }
+
+@media(max-width:640px){
+  .floater-tr{ display: none; } /* keep mobile clean */
+}
+@media(max-width:380px){
+  .floater{ padding: .5rem .65rem; gap: .4rem; }
+  .floater-icon{ height: 1.7rem; width: 1.7rem; border-radius: 8px; }
+  .floater-title{ font-size: .68rem; }
+  .floater-tl{ top: .7rem; left: .35rem; }
+  .floater-br{ right: .35rem; bottom: .7rem; }
+  .portrait-name{ font-size: 1.05rem; }
+  .portrait-nameplate{ padding: 2rem .85rem .85rem; }
+}
+
+
+/* Fix: floaters visible above 3D portrait (no translateZ stacking issues) */
+.portrait-wrap .floater{
+  z-index: 20 !important;
+  transform: none !important;
+  animation: float 4.5s ease-in-out infinite;
+}
+.portrait-wrap .floater-tl{ top: 12px !important; left: 10px !important; }
+.portrait-wrap .floater-tr{ top: 12px !important; right: 10px !important; }
+.portrait-wrap .floater-br{ bottom: 52px !important; right: 10px !important; }
+.portrait-wrap .floater-online{
+  z-index: 21 !important;
+  transform: none !important;
+  left: 12px !important;
+  bottom: 12px !important;
+}
+.portrait-wrap .portrait-nameplate{
+  transform: none !important;
+  z-index: 15 !important;
+}
+.hero{ overflow: visible !important; }
+.hero-right{ overflow: visible !important; }
+.portrait-wrap{ overflow: visible !important; }
