@@ -1798,3 +1798,91 @@
     white-space:normal;text-align:center;
   }
 }
+
+
+/* ===== Polish: primary CTAs in hero ===== */
+.hero-cta-group{
+  display:flex; flex-wrap:wrap; align-items:center; gap:.75rem;
+}
+.btn-primary{
+  display:inline-flex; align-items:center; justify-content:center; gap:.4rem;
+  background-image: var(--gradient-primary);
+  color: var(--primary-foreground);
+  padding: .85rem 1.5rem;
+  border-radius: 9999px;
+  font-size: .875rem; font-weight: 700;
+  box-shadow: var(--shadow-glow);
+  transition: transform .2s ease, box-shadow .25s ease;
+}
+.btn-primary:hover{
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 0 32px oklch(0.7 0.22 295 / .55);
+}
+.btn-hire{
+  display:inline-flex; align-items:center; justify-content:center;
+  background: color-mix(in oklab, var(--foreground) 92%, transparent);
+  color: var(--background);
+  padding: .85rem 1.35rem;
+  border-radius: 9999px;
+  font-size: .875rem; font-weight: 700;
+  transition: transform .2s ease, opacity .2s ease;
+}
+.btn-hire:hover{ transform: translateY(-2px); opacity: .92; }
+
+/* Footer polish */
+footer{
+  border-top: 1px solid var(--border);
+  padding: 2.75rem 0 7.5rem;
+}
+@media(min-width:768px){
+  footer{ padding: 2.75rem 0 3rem; }
+}
+.footer-inner{
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+@media(min-width:768px){
+  .footer-inner{
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+.footer-brand{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: .35rem;
+}
+.footer-copy{
+  font-size: .8rem;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+.footer-links{
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem 1.15rem;
+}
+.footer-links a{
+  font-size: .8rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  transition: color .2s;
+}
+.footer-links a:hover{ color: var(--accent); }
+
+/* Cover-flow card hover lift (active card already has some; reinforce) */
+.cf-card.cf-active{
+  transition: transform .35s cubic-bezier(.34,1.56,.64,1), filter .3s ease, opacity .3s ease;
+}
+.cf-card.cf-active:hover{
+  filter: brightness(1.12);
+}
+
+/* Slightly smoother reveal */
+.reveal{
+  transition: opacity .7s cubic-bezier(.4,0,.2,1), transform .7s cubic-bezier(.4,0,.2,1);
+}
